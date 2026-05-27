@@ -19,7 +19,8 @@ const works = [
   { title: "The REAL Reason You're Not Achieving Your Goals", category: "Short Form", videoUrl: "https://youtube.com/shorts/bdAE1V-zlUI?feature=share", description: "Reason Behind Your Failures.", thumbnail: "/work/Short6.png" },
   { title: "Stretching Before Training; Myth or Real",        category: "Short Form", videoUrl: "https://youtube.com/shorts/2tT-PO0y9Mc?feature=share", description: "Why Static Stretching Is Making You Weaker.", thumbnail: "/work/Short7.png" },
   { title: "Sarvam AI - India's AI Mission",                  category: "Short Form", videoUrl: "https://www.youtube.com/shorts/TP_1h33F33A", description: "Why Sarvam AI Is Such A Big Deal.", thumbnail: "/work/Short2.png" },
-  { title: "Welcome To Loomia",                               category: "Ads", videoUrl: "https://www.youtube.com/watch?v=2XiiI_GJtRE", description: "High-Converting SaaS Ad Edit With Clean Transitions & Fast-Pacing.", thumbnail: "/work/testimonial-series.jpg" },
+  { title: "Welcome To Loomia",                               category: "Ads", videoUrl: "https://www.youtube.com/watch?v=2XiiI_GJtRE", description: "High-Converting SaaS Ad Edit With Clean Transitions & Fast-Pacing.", thumbnail: "/work/ads1.png" },
+  { title: "Welcome To RazorFrameStudios",                    category: "Ads", videoUrl: "https://youtu.be/5RdRNtwQ8ig", description: "High-Converting SaaS Ad Edit With Clean Transitions & Fast-Pacing.", thumbnail: "/work/ads2.png" },
   { title: "Thumbnail 1",                                     category: "Thumbnails", thumbnail: "/work/Thumb 1.png" },
   { title: "Thumbnail 2",                                     category: "Thumbnails", thumbnail: "/work/Thumb 2.png" },
   { title: "Thumbnail 3",                                     category: "Thumbnails", thumbnail: "/work/Thumb 3.png" },
@@ -173,8 +174,6 @@ function FadeUp({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
 
 export default function WorkPage() {
   const { isMobile, isTablet } = useBreakpoint();
-
-  // ✅ Fix: start false on both server and client, update after mount
   const [isLargeDesktop, setIsLargeDesktop] = useState(false);
   useEffect(() => {
     const check = () => setIsLargeDesktop(window.innerWidth >= 1600);

@@ -76,6 +76,8 @@ const services = [
     icon: "◉",
     cards: [
       { image: "/services/ads1.png", videoUrl: "https://www.youtube.com/watch?v=2XiiI_GJtRE" },
+      { image: "/services/ads2.png", videoUrl: "https://youtu.be/5RdRNtwQ8ig" },
+
     ],
   },
   {
@@ -348,7 +350,7 @@ function LongFormStack({ cards, scale = 1 }: { cards: typeof services[0]["cards"
       {configs.map((c, i) => (
         <motion.div
           key={i}
-          whileHover={{ y: -20, scale: 1.08, opacity: 1, zIndex: 10 }}
+          whileHover={{ y: -20, scale: 1.3, opacity: 1, zIndex: 10 }}
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
           style={{ position: "absolute", top: c.top, left: c.left, zIndex: c.zIndex, opacity: c.opacity }}
         >
@@ -368,36 +370,30 @@ function LongFormStack({ cards, scale = 1 }: { cards: typeof services[0]["cards"
  * AdsStack — single featured 16:9 card with a glow ring.
  */
 function AdsStack({ cards, scale = 1 }: { cards: typeof services[0]["cards"]; scale?: number }) {
-  const W = Math.round(340 * scale);
-  const H = Math.round(191 * scale);
-
+  const W = Math.round(300 * scale);
+  const H = Math.round(169 * scale);
+  const offset = Math.round(20 * scale);
+  const configs = [
+    { top: -90,    left: -80, opacity: 1 , rotate: -6},
+    { top: 90,     left:  80, opacity: 1 , rotate: 6},
+  ];
   return (
-    <div style={{
-      position: "relative",
-      width: W + Math.round(16 * scale),
-      height: H + Math.round(16 * scale),
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-    }}>
-      <div style={{
-        position: "absolute", inset: 0,
-        borderRadius: "16px",
-        boxShadow: "0 0 40px rgba(3,192,74,0.12)",
-        pointerEvents: "none",
-      }} />
-      <motion.div
-        whileHover={{ y: -10, scale: 1.04, zIndex: 10 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
-        style={{ position: "relative", zIndex: 1 }}
-      >
-        <VideoCard
-          image={cards[0].image}
-          videoUrl={(cards[0] as any).videoUrl ?? ""}
-          width={W} height={H}
-          category="Ads"
-        />
-      </motion.div>
+    <div style={{ position: "relative", width: W + offset * 2, height: H + Math.round(56 * scale) }}>
+      {configs.map((c, i) => (
+        <motion.div
+          key={i}
+          whileHover={{ y: -20, scale: 1.1, opacity: 1, zIndex: 10, rotate: 0 }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
+          style={{ position: "absolute", top: c.top, left: c.left, opacity: c.opacity , rotate: c.rotate}}
+        >
+          <VideoCard
+            image={cards[i].image}
+            videoUrl={(cards[i] as any).videoUrl ?? ""}
+            width={W} height={H}
+            category="Ads"
+          />
+        </motion.div>
+      ))}
     </div>
   );
 }
@@ -461,9 +457,9 @@ function ThumbnailsStack({ cards, scale = 1 }: { cards: typeof services[0]["card
   const sideTop = Math.round(18 * scale);
 
   const configs = [
-    { top: sideTop, left: 0,                          width: SW, height: SH, rotate: -5, opacity: 0.55, zIndex: 1 },
+    { top: sideTop, left: 0,                          width: SW, height: SH, rotate: -5, opacity: 1, zIndex: 1 },
     { top: 0,       left: SW - overlap,               width: CW, height: CH, rotate:  0, opacity: 1,    zIndex: 3 },
-    { top: sideTop, left: SW - overlap + CW - overlap, width: SW, height: SH, rotate:  5, opacity: 0.55, zIndex: 1 },
+    { top: sideTop, left: SW - overlap + CW - overlap, width: SW, height: SH, rotate:  5, opacity: 1, zIndex: 1 },
   ];
 
   return (

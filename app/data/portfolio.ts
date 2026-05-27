@@ -1,19 +1,19 @@
 export const portfolio = [
   {
     title: "AI Tools Worth Using",
-    videoUrl: "https://www.youtube.com/watch?v=yILNnRbIP8o",
+    videoUrl: "https://youtu.be/zr5B-v7Kqg8",
   },
   {
     title: "How Modern Creators Make Money",
-    videoUrl: "https://www.youtube.com/watch?v=zqbyIXxXtQE",
+    videoUrl: "https://youtu.be/mtYGi7_w98o",
   },
   {
     title: "Welcome To Loomia",
-    videoUrl: "https://www.youtube.com/watch?v=2XiiI_GJtRE",
+    videoUrl: "https://youtu.be/2XiiI_GJtRE?si=ea8slg8aE5tLpgbr",
   },
   {
     title: "Problem With Fitness Tier Lists",
-    videoUrl: "https://www.youtube.com/watch?v=rW7yzVeOCZI",
+    videoUrl: "https://youtu.be/YAHxPgKXIFw",
   },
   {
     title: "Why Most Digital Products Fail",
