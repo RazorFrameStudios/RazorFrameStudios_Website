@@ -21,10 +21,10 @@ const works = [
   { title: "Sarvam AI - India's AI Mission",                  category: "Short Form", videoUrl: "https://www.youtube.com/shorts/TP_1h33F33A", description: "Why Sarvam AI Is Such A Big Deal.", thumbnail: "/work/Short2.png" },
   { title: "Welcome To Loomia",                               category: "Ads", videoUrl: "https://www.youtube.com/watch?v=2XiiI_GJtRE", description: "High-Converting SaaS Ad Edit With Clean Transitions & Fast-Pacing.", thumbnail: "/work/ads1.png" },
   { title: "Welcome To RazorFrameStudios",                    category: "Ads", videoUrl: "https://youtu.be/5RdRNtwQ8ig", description: "High-Converting SaaS Ad Edit With Clean Transitions & Fast-Pacing.", thumbnail: "/work/ads2.png" },
-  { title: "Thumbnail 1",                                     category: "Thumbnails", thumbnail: "/work/Thumb 1.png" },
-  { title: "Thumbnail 2",                                     category: "Thumbnails", thumbnail: "/work/Thumb 2.png" },
-  { title: "Thumbnail 3",                                     category: "Thumbnails", thumbnail: "/work/Thumb 3.png" },
-  { title: "Thumbnail 4",                                     category: "Thumbnails", thumbnail: "/work/Thumb 4.png" },
+  { title: "Thumbnail 1",                                     category: "Thumbnails", videoUrl: "", thumbnail: "/work/Thumb 1.png" },
+  { title: "Thumbnail 2",                                     category: "Thumbnails", videoUrl: "", thumbnail: "/work/Thumb 2.png" },
+  { title: "Thumbnail 3",                                     category: "Thumbnails", videoUrl: "", thumbnail: "/work/Thumb 3.png" },
+  { title: "Thumbnail 4",                                     category: "Thumbnails",videoUrl: "", thumbnail: "/work/Thumb 4.png" },
 ];
 
 const categories = ["All", "Long Form", "Short Form", "Ads", "Thumbnails"];
