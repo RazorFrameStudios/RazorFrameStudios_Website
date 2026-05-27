@@ -1,8 +1,6 @@
-// app/api/bookings/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 import { sendClientConfirmation, sendOwnerNotification } from "@/lib/email";
-import { createMeetLink, localToUTC } from "@/lib/google-meet";
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr + "T00:00:00").toLocaleDateString("en-US", {
@@ -25,7 +23,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { name, email, date, timeSlot, timezone, details } = body;
 
-    // ── Validation ────────────────────────────────────────────────────────────
+    // Basic validation
     if (!name || !email || !date || !timeSlot || !timezone) {
       return NextResponse.json(
         { error: "Missing required fields" },
@@ -33,31 +31,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ── Convert booking local time → UTC ──────────────────────────────────────
-    // Used for the cron's time-window query and for the Calendar event
-    const utcStart = localToUTC(date, timeSlot, timezone);
-
-    // ── Generate Google Meet link ─────────────────────────────────────────────
-    // We generate it at booking time so it's ready for both reminder emails.
-    // If Google Calendar fails we still confirm the booking (meet_link = "").
-    let meetLink = "";
-    try {
-      const bookingRef = `${date}-${timeSlot.replace(":", "")}`;
-      meetLink = await createMeetLink(name, utcStart, bookingRef);
-    } catch (meetErr) {
-      console.error("Google Meet creation failed (booking will still be saved):", meetErr);
-    }
-
-    // ── Persist to database ───────────────────────────────────────────────────
-    // The UNIQUE constraint on (date, time_slot) prevents double-booking.
+    // Insert into DB — unique constraint handles double-booking
     await pool.query(
-      `INSERT INTO bookings
-         (name, email, date, time_slot, timezone, details, utc_datetime, meet_link)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
-      [name, email, date, timeSlot, timezone, details ?? "", utcStart, meetLink]
+      `INSERT INTO bookings (name, email, date, time_slot, timezone, details)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [name, email, date, timeSlot, timezone, details ?? ""]
     );
 
-    // ── Send confirmation emails ──────────────────────────────────────────────
     const emailData = {
       name,
       email,
@@ -67,15 +47,15 @@ export async function POST(req: NextRequest) {
       details:  details ?? "",
     };
 
+    // Send both emails concurrently
     await Promise.all([
       sendClientConfirmation(emailData),
       sendOwnerNotification(emailData),
     ]);
 
     return NextResponse.json({ success: true });
-
   } catch (err: any) {
-    // Unique violation → slot already taken
+    // Unique violation = slot already taken
     if (err.code === "23505") {
       return NextResponse.json(
         { error: "This slot was just booked. Please choose another time." },
