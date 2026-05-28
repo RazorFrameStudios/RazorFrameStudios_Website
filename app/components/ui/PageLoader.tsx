@@ -70,7 +70,7 @@ export default function PageLoader() {
             style={{ opacity: 1, zIndex: 0 }}
           >
             <source
-              src={cacheBust ? `/loading.mp4?v=${cacheBust}` : `/loading.mp4`}
+              src={cacheBust ? `https://thzrymlstodkdybfzovu.supabase.co/storage/v1/object/public/Landing%20page%20videos/loading.mp4?v=${cacheBust}` : `/loading.mp4`}
               type="video/mp4"
             />
           </video>

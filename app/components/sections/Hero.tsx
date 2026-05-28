@@ -231,7 +231,7 @@ export default function Hero() {
         className="absolute inset-0 w-full h-full object-cover"
         style={{ opacity: 1, zIndex: 0 }}
       >
-        <source src="/hero-bg.mp4" type="video/mp4" />
+        <source src="https://thzrymlstodkdybfzovu.supabase.co/storage/v1/object/public/Landing%20page%20videos/hero-bg.mp4" type="video/mp4" />
       </video>
 
       {/* Content grid */}
@@ -423,7 +423,7 @@ export default function Hero() {
                 autoPlay muted loop playsInline
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               >
-                <source src="/showreel.mp4" type="video/mp4" />
+                <source src="https://thzrymlstodkdybfzovu.supabase.co/storage/v1/object/public/Landing%20page%20videos/showreel.mp4" type="video/mp4" />
               </video>
               <div
                 style={{
