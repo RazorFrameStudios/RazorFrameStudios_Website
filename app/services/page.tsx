@@ -77,7 +77,6 @@ const services = [
     cards: [
       { image: "/services/ads1.png", videoUrl: "https://www.youtube.com/watch?v=2XiiI_GJtRE" },
       { image: "/services/ads2.png", videoUrl: "https://youtu.be/5RdRNtwQ8ig" },
-
     ],
   },
   {
@@ -110,7 +109,7 @@ const services = [
   },
 ];
 
-// ─── Utility ────────────────────────────────────────────────────────────────
+// ─── Utility ──────────────────────────────────────────────────────────────────
 
 function FadeUp({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   return (
@@ -125,16 +124,14 @@ function FadeUp({ children, delay = 0 }: { children: React.ReactNode; delay?: nu
   );
 }
 
-// ─── Cards ───────────────────────────────────────────────────────────────────
+// ─── Cards ────────────────────────────────────────────────────────────────────
 
-/** Image-only card (Scripting, Growth Strategy, Thumbnails) */
 function ImageCard({
   image, width, height, category,
 }: {
   image: string; width: number; height: number; category: string;
 }) {
   const [hovered, setHovered] = useState(false);
-
   return (
     <Link
       href={`/work?category=${encodeURIComponent(category)}`}
@@ -145,24 +142,18 @@ function ImageCard({
         onHoverEnd={() => setHovered(false)}
         style={{
           width, height,
-          borderRadius: "12px",
-          overflow: "hidden",
-          position: "relative",
+          borderRadius: "12px", overflow: "hidden", position: "relative",
           border: `0.5px solid ${hovered ? "rgba(3,192,74,0.5)" : "rgba(255,255,255,0.1)"}`,
-          background: "#111",
-          cursor: "pointer",
+          background: "#111", cursor: "pointer",
         }}
         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
       >
         <img
           src={image} alt=""
           style={{
-            position: "absolute", inset: 0,
-            width: "100%", height: "100%",
-            objectFit: "cover",
-            transition: "transform 0.4s ease",
-            transform: hovered ? "scale(1.05)" : "scale(1)",
-            zIndex: 1,
+            position: "absolute", inset: 0, width: "100%", height: "100%",
+            objectFit: "cover", transition: "transform 0.4s ease",
+            transform: hovered ? "scale(1.05)" : "scale(1)", zIndex: 1,
           }}
           onError={e => { e.currentTarget.style.display = "none"; }}
         />
@@ -178,20 +169,12 @@ function ImageCard({
   );
 }
 
-/**
- * Video card — shows the provided thumbnail image at rest.
- * On hover, mounts a muted auto-playing YouTube iframe that fills the card.
- * The iframe has pointerEvents: none so the Link still handles clicks.
- */
 function VideoCard({
   image, videoUrl, width, height, category,
 }: {
-  image: string; videoUrl: string;
-  width: number; height: number;
-  category: string;
+  image: string; videoUrl: string; width: number; height: number; category: string;
 }) {
   const [hovered, setHovered] = useState(false);
-
   return (
     <Link
       href={`/work?category=${encodeURIComponent(category)}`}
@@ -202,52 +185,37 @@ function VideoCard({
         onHoverEnd={() => setHovered(false)}
         style={{
           width, height,
-          borderRadius: "12px",
-          overflow: "hidden",
-          position: "relative",
+          borderRadius: "12px", overflow: "hidden", position: "relative",
           border: `0.5px solid ${hovered ? "rgba(3,192,74,0.5)" : "rgba(255,255,255,0.1)"}`,
-          background: "#111",
-          cursor: "pointer",
+          background: "#111", cursor: "pointer",
         }}
         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
       >
-        {/* Thumbnail — always present, fades out on hover */}
         <img
           src={image} alt=""
           style={{
-            position: "absolute", inset: 0,
-            width: "100%", height: "100%",
-            objectFit: "cover",
-            opacity: hovered ? 0 : 1,
-            transition: "opacity 0.3s",
-            zIndex: 1,
+            position: "absolute", inset: 0, width: "100%", height: "100%",
+            objectFit: "cover", opacity: hovered ? 0 : 1,
+            transition: "opacity 0.3s", zIndex: 1,
           }}
           onError={e => { e.currentTarget.style.display = "none"; }}
         />
-
-        {/* YouTube iframe — only mounted while hovered */}
         {hovered && (
           <iframe
             src={getEmbedUrl(videoUrl)}
             allow="autoplay; encrypted-media"
             allowFullScreen={false}
             style={{
-              position: "absolute", inset: 0,
-              width: "100%", height: "100%",
-              border: "none",
-              zIndex: 2,
-              pointerEvents: "none", // prevent iframe stealing hover / click
+              position: "absolute", inset: 0, width: "100%", height: "100%",
+              border: "none", zIndex: 2, pointerEvents: "none",
             }}
           />
         )}
-
-        {/* Green tint overlay on hover */}
         {hovered && (
           <div style={{
             position: "absolute", inset: 0,
             background: "linear-gradient(to top, rgba(3,192,74,0.18) 0%, transparent 60%)",
-            pointerEvents: "none",
-            zIndex: 3,
+            pointerEvents: "none", zIndex: 3,
           }} />
         )}
       </motion.div>
@@ -255,24 +223,18 @@ function VideoCard({
   );
 }
 
-// ─── Stacks ──────────────────────────────────────────────────────────────────
+// ─── Stacks ───────────────────────────────────────────────────────────────────
 
-/**
- * ScriptingStack — three 16:9 cards fanned symmetrically.
- * Left/right cards rotate outward and are dimmed; centre card is upright and bright.
- */
 function ScriptingStack({ cards, scale = 1 }: { cards: typeof services[0]["cards"]; scale?: number }) {
   const W = Math.round(260 * scale);
-  const H = Math.round(146 * scale); // 16:9
+  const H = Math.round(146 * scale);
   const containerW = W + Math.round(80 * scale);
   const containerH = H + Math.round(80 * scale);
-
   const configs = [
-    { top: Math.round(80 * scale), left: 0,                      rotate: -8, zIndex: 1, opacity: 0.5 },
+    { top: Math.round(80 * scale), left: 0,                       rotate: -8, zIndex: 1, opacity: 0.5 },
     { top: Math.round(40 * scale), left: Math.round(60 * scale),  rotate:  0, zIndex: 2, opacity: 1   },
     { top: Math.round(80 * scale), left: Math.round(120 * scale), rotate:  8, zIndex: 1, opacity: 0.5 },
   ];
-
   return (
     <div style={{ position: "relative", width: containerW, height: containerH }}>
       {configs.map((c, i) => (
@@ -280,14 +242,7 @@ function ScriptingStack({ cards, scale = 1 }: { cards: typeof services[0]["cards
           key={i}
           whileHover={{ y: -16, scale: 1.3, opacity: 1, rotate: 0, zIndex: 10 }}
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
-          style={{
-            position: "absolute",
-            top: c.top, left: c.left,
-            rotate: c.rotate,
-            zIndex: c.zIndex,
-            opacity: c.opacity,
-            transformOrigin: "bottom center",
-          }}
+          style={{ position: "absolute", top: c.top, left: c.left, rotate: c.rotate, zIndex: c.zIndex, opacity: c.opacity, transformOrigin: "bottom center" }}
         >
           <ImageCard image={cards[i]?.image ?? ""} width={W} height={H} category="Scripting" />
         </motion.div>
@@ -296,9 +251,6 @@ function ScriptingStack({ cards, scale = 1 }: { cards: typeof services[0]["cards
   );
 }
 
-/**
- * ShortFormStack — three 9:16 portrait cards spread in a fan with rotation.
- */
 function ShortFormStack({ cards, scale = 1 }: { cards: typeof services[0]["cards"]; scale?: number }) {
   const W = Math.round(120 * scale);
   const H = Math.round(213 * scale);
@@ -315,11 +267,7 @@ function ShortFormStack({ cards, scale = 1 }: { cards: typeof services[0]["cards
           key={i}
           whileHover={{ y: -18, scale: 1.45, rotate: 0, zIndex: 10 }}
           transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] as const }}
-          style={{
-            position: "absolute", left: c.left, top: c.top,
-            zIndex: c.zIndex, rotate: c.rotate,
-            transformOrigin: "bottom center",
-          }}
+          style={{ position: "absolute", left: c.left, top: c.top, zIndex: c.zIndex, rotate: c.rotate, transformOrigin: "bottom center" }}
         >
           <VideoCard
             image={cards[i].image}
@@ -333,16 +281,13 @@ function ShortFormStack({ cards, scale = 1 }: { cards: typeof services[0]["cards
   );
 }
 
-/**
- * LongFormStack — three 16:9 cards in a cascading diagonal stack.
- */
 function LongFormStack({ cards, scale = 1 }: { cards: typeof services[0]["cards"]; scale?: number }) {
   const W = Math.round(300 * scale);
   const H = Math.round(169 * scale);
   const offset = Math.round(20 * scale);
   const configs = [
-    { top: 0,          left: +100, opacity: 0.45, zIndex: 1 },
-    { top: offset,     left:  +30, opacity: 0.7,  zIndex: 2 },
+    { top: 0,          left: +100, opacity: 0.8, zIndex: 1 },
+    { top: offset,     left:  +30, opacity: 0.9,  zIndex: 2 },
     { top: offset * 2, left:  -40, opacity: 1,    zIndex: 3 },
   ];
   return (
@@ -366,16 +311,13 @@ function LongFormStack({ cards, scale = 1 }: { cards: typeof services[0]["cards"
   );
 }
 
-/**
- * AdsStack — single featured 16:9 card with a glow ring.
- */
 function AdsStack({ cards, scale = 1 }: { cards: typeof services[0]["cards"]; scale?: number }) {
   const W = Math.round(300 * scale);
   const H = Math.round(169 * scale);
   const offset = Math.round(20 * scale);
   const configs = [
-    { top: -90,    left: -80, opacity: 1 , rotate: -6},
-    { top: 90,     left:  80, opacity: 1 , rotate: 6},
+    { top: -90, left: -80, opacity: 1, rotate: -6 },
+    { top:  90, left:  80, opacity: 1, rotate:  6 },
   ];
   return (
     <div style={{ position: "relative", width: W + offset * 2, height: H + Math.round(56 * scale) }}>
@@ -384,7 +326,7 @@ function AdsStack({ cards, scale = 1 }: { cards: typeof services[0]["cards"]; sc
           key={i}
           whileHover={{ y: -20, scale: 1.1, opacity: 1, zIndex: 10, rotate: 0 }}
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
-          style={{ position: "absolute", top: c.top, left: c.left, opacity: c.opacity , rotate: c.rotate}}
+          style={{ position: "absolute", top: c.top, left: c.left, opacity: c.opacity, rotate: c.rotate }}
         >
           <VideoCard
             image={cards[i].image}
@@ -398,25 +340,18 @@ function AdsStack({ cards, scale = 1 }: { cards: typeof services[0]["cards"]; sc
   );
 }
 
-/**
- * GrowthStrategyStack — three 16:9 cards in a vertical cascade, shifting
- * left-to-right as they descend (like a roadmap / timeline rhythm).
- */
 function GrowthStrategyStack({ cards, scale = 1 }: { cards: typeof services[0]["cards"]; scale?: number }) {
   const W = Math.round(280 * scale);
-  const H = Math.round(158 * scale); // 16:9
+  const H = Math.round(158 * scale);
   const vGap  = Math.round(22 * scale);
   const hStep = Math.round(32 * scale);
-
   const configs = [
     { top: 0,        left: hStep * 2, opacity: 0.4, zIndex: 1, rotate:  2 },
     { top: vGap,     left: hStep,     opacity: 0.7, zIndex: 2, rotate:  0 },
     { top: vGap * 2, left: 0,         opacity: 1,   zIndex: 3, rotate: -2 },
   ];
-
   const containerW = W + hStep * 2 + Math.round(8 * scale);
   const containerH = H + vGap * 2  + Math.round(24 * scale);
-
   return (
     <div style={{ position: "relative", width: containerW, height: containerH }}>
       {configs.map((c, i) => (
@@ -424,14 +359,7 @@ function GrowthStrategyStack({ cards, scale = 1 }: { cards: typeof services[0]["
           key={i}
           whileHover={{ y: -18, scale: 1.07, opacity: 1, rotate: 0, zIndex: 10 }}
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
-          style={{
-            position: "absolute",
-            top: c.top, left: c.left,
-            rotate: c.rotate,
-            zIndex: c.zIndex,
-            opacity: c.opacity,
-            transformOrigin: "center center",
-          }}
+          style={{ position: "absolute", top: c.top, left: c.left, rotate: c.rotate, zIndex: c.zIndex, opacity: c.opacity, transformOrigin: "center center" }}
         >
           <ImageCard image={cards[i]?.image ?? ""} width={W} height={H} category="Growth Strategy" />
         </motion.div>
@@ -440,28 +368,20 @@ function GrowthStrategyStack({ cards, scale = 1 }: { cards: typeof services[0]["
   );
 }
 
-/**
- * ThumbnailsStack — three 16:9 cards in a tight horizontal strip.
- * The centre card sits elevated and at full scale; the flanking cards
- * are slightly shorter, dimmer, and angled inward.
- */
 function ThumbnailsStack({ cards, scale = 1 }: { cards: typeof services[0]["cards"]; scale?: number }) {
   const CW = Math.round(200 * scale);
   const CH = Math.round(113 * scale);
   const SW = Math.round(160 * scale);
   const SH = Math.round(90  * scale);
   const overlap = Math.round(24 * scale);
-
   const containerW = SW * 2 + CW - overlap * 2 + Math.round(8 * scale);
   const containerH = CH + Math.round(28 * scale);
   const sideTop = Math.round(18 * scale);
-
   const configs = [
-    { top: sideTop, left: 0,                          width: SW, height: SH, rotate: -5, opacity: 1, zIndex: 1 },
-    { top: 0,       left: SW - overlap,               width: CW, height: CH, rotate:  0, opacity: 1,    zIndex: 3 },
-    { top: sideTop, left: SW - overlap + CW - overlap, width: SW, height: SH, rotate:  5, opacity: 1, zIndex: 1 },
+    { top: sideTop, left: 0,                              width: SW, height: SH, rotate: -5, opacity: 1, zIndex: 1 },
+    { top: 0,       left: SW - overlap,                   width: CW, height: CH, rotate:  0, opacity: 1, zIndex: 3 },
+    { top: sideTop, left: SW - overlap + CW - overlap,    width: SW, height: SH, rotate:  5, opacity: 1, zIndex: 1 },
   ];
-
   return (
     <div style={{ position: "relative", width: containerW, height: containerH }}>
       {configs.map((c, i) => (
@@ -469,14 +389,7 @@ function ThumbnailsStack({ cards, scale = 1 }: { cards: typeof services[0]["card
           key={i}
           whileHover={{ y: -16, scale: 1.5, opacity: 1, rotate: 0, zIndex: 10 }}
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
-          style={{
-            position: "absolute",
-            top: c.top, left: c.left,
-            rotate: c.rotate,
-            zIndex: c.zIndex,
-            opacity: c.opacity,
-            transformOrigin: "bottom center",
-          }}
+          style={{ position: "absolute", top: c.top, left: c.left, rotate: c.rotate, zIndex: c.zIndex, opacity: c.opacity, transformOrigin: "bottom center" }}
         >
           <ImageCard image={cards[i]?.image ?? ""} width={c.width} height={c.height} category="Thumbnails" />
         </motion.div>
@@ -488,52 +401,71 @@ function ThumbnailsStack({ cards, scale = 1 }: { cards: typeof services[0]["card
 // ─── Visual router ────────────────────────────────────────────────────────────
 
 function ServiceVisual({ service, scale }: { service: typeof services[0]; scale?: number }) {
-  if (service.id === "scripting")  return <ScriptingStack       cards={service.cards} scale={scale} />;
-  if (service.id === "short")      return <ShortFormStack        cards={service.cards} scale={scale} />;
-  if (service.id === "long")       return <LongFormStack         cards={service.cards} scale={scale} />;
-  if (service.id === "ads")        return <AdsStack              cards={service.cards} scale={scale} />;
-  if (service.id === "growth")     return <GrowthStrategyStack   cards={service.cards} scale={scale} />;
-  if (service.id === "thumbnails") return <ThumbnailsStack       cards={service.cards} scale={scale} />;
+  if (service.id === "scripting")  return <ScriptingStack      cards={service.cards} scale={scale} />;
+  if (service.id === "short")      return <ShortFormStack       cards={service.cards} scale={scale} />;
+  if (service.id === "long")       return <LongFormStack        cards={service.cards} scale={scale} />;
+  if (service.id === "ads")        return <AdsStack             cards={service.cards} scale={scale} />;
+  if (service.id === "growth")     return <GrowthStrategyStack  cards={service.cards} scale={scale} />;
+  if (service.id === "thumbnails") return <ThumbnailsStack      cards={service.cards} scale={scale} />;
   return null;
 }
 
 // ─── Text block ───────────────────────────────────────────────────────────────
 
-function ServiceText({ service, isLarge }: { service: typeof services[0]; isLarge?: boolean }) {
+function ServiceText({ service, isLarge, isMobile, isTablet, isLaptop, isDesktop, is2K, is4K }: { service: typeof services[0]; isLarge?: boolean; isMobile?: boolean; isTablet?: boolean; isLaptop?: boolean; isDesktop?: boolean; is2K?: boolean; is4K?: boolean }) {
+  const taglineFontSize = isLarge ? (is4K ? "1.5rem" : is2K ? "1.3rem" : "0.95rem") : "0.8rem";
+  const taglinePadding = isLarge ? (is4K ? "0.5rem 1.4rem" : is2K ? "0.45rem 1.2rem" : "0.4rem 1.1rem") : "0.3rem 0.85rem";
+  const taglineMarginBottom = isLarge ? (is4K ? "2.25rem" : is2K ? "2rem" : "1.75rem") : "1.25rem";
+  
+  const h2FontSize = isLarge ? (is4K ? "clamp(8rem, 3.2vw, 4.5rem)" : is2K ? "clamp(5rem, 3vw, 4rem)" : "clamp(2.5rem, 2.8vw, 3.8rem)") : "clamp(2rem, 3.5vw, 3rem)";
+  const h2MarginBottom = isLarge ? (is4K ? "1.5rem" : is2K ? "1.35rem" : "1.25rem") : "1rem";
+  
+  const pFontSize = isLarge ? (is4K ? "2rem" : is2K ? "1.5rem" : "1.1rem") : "0.95rem";
+  const pMarginBottom = isLarge ? (is4K ? "3rem" : is2K ? "2.75rem" : "2.5rem") : "2rem";
+  const pMaxWidth = isLarge ? (is4K ? "1000px" : is2K ? "800px" : "520px") : undefined;
+  
+  const featureFontSize = isLarge ? (is4K ? "2rem" : is2K ? "1.5rem" : "0.85rem") : "0.75rem";
+  const featurePadding = isLarge ? (is4K ? "0.6rem 1.4rem" : is2K ? "0.5rem 1.2rem" : "0.45rem 1.1rem") : "0.35rem 0.85rem";
+  const featuresMarginBottom = isLarge ? (is4K ? "3.5rem" : is2K ? "3.25rem" : "3rem") : "2.5rem";
+  
+  const buttonFontSize = isLarge ? (is4K ? "1.7rem" : is2K ? "1.2rem" : "1rem") : "0.9rem";
+  const buttonPadding = isLarge ? (is4K ? "1.25rem 3rem" : is2K ? "1.15rem 2.5rem" : "1rem 2.25rem") : "0.8rem 1.75rem";
+  
   return (
-    <div>
+    <div style={{ textAlign: "center" }}>
       <div style={{
         display: "inline-flex", alignItems: "center", gap: "0.5rem",
         background: "rgba(3,192,74,0.08)", border: "0.5px solid rgba(3,192,74,0.2)",
         borderRadius: "9999px",
-        padding: isLarge ? "0.4rem 1.1rem" : "0.3rem 0.85rem",
-        marginBottom: isLarge ? "1.75rem" : "1.25rem",
+        padding: taglinePadding,
+        marginBottom: taglineMarginBottom,
       }}>
-        <span style={{ color: "#03C04A", fontSize: isLarge ? "0.95rem" : "0.8rem" }}>{service.icon}</span>
-        <span style={{ color: "#03C04A", fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400, fontSize: isLarge ? "0.85rem" : "0.7rem", letterSpacing: "0.2em", textTransform: "uppercase" }}>{service.tagline}</span>
+        <span style={{ color: "#03C04A", fontSize: taglineFontSize }}>{service.icon}</span>
+        <span style={{ color: "#03C04A", fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400, fontSize: taglineFontSize, letterSpacing: "0.2em", textTransform: "uppercase" }}>{service.tagline}</span>
       </div>
 
       <h2 style={{
-        fontSize: isLarge ? "clamp(2.5rem, 2.8vw, 3.8rem)" : "clamp(2rem, 3.5vw, 3rem)",
+        fontSize: h2FontSize,
         fontFamily: "'Coolvetica', sans-serif", fontWeight: 600,
         letterSpacing: "-0.02em", lineHeight: 1.1,
-        color: "white", marginBottom: isLarge ? "1.25rem" : "1rem",
+        color: "white", marginBottom: h2MarginBottom,
       }}>{service.title}</h2>
 
       <p style={{
-        fontSize: isLarge ? "1.1rem" : "0.95rem",
+        fontSize: pFontSize,
         fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400,
         color: "rgba(255,255,255,0.55)", lineHeight: 1.8,
-        marginBottom: isLarge ? "2.5rem" : "2rem",
-        maxWidth: isLarge ? "520px" : undefined,
+        marginBottom: pMarginBottom,
+        maxWidth: pMaxWidth,
+        margin: "0 auto " + pMarginBottom,
       }}>{service.description}</p>
 
-      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: isLarge ? "3rem" : "2.5rem" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginBottom: featuresMarginBottom, justifyContent: "center" }}>
         {service.features.map(f => (
           <span key={f} style={{
-            fontSize: isLarge ? "0.85rem" : "0.75rem",
+            fontSize: featureFontSize,
             fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400,
-            padding: isLarge ? "0.45rem 1.1rem" : "0.35rem 0.85rem",
+            padding: featurePadding,
             borderRadius: "9999px",
             background: "rgba(255,255,255,0.05)", border: "0.5px solid rgba(255,255,255,0.1)",
             color: "rgba(255,255,255,0.6)", letterSpacing: "0.02em",
@@ -546,10 +478,10 @@ function ServiceText({ service, isLarge }: { service: typeof services[0]; isLarg
         style={{
           display: "inline-flex", alignItems: "center", gap: "0.5rem",
           background: BTN_GREEN, color: "#fff",
-          padding: isLarge ? "1rem 2.25rem" : "0.8rem 1.75rem",
+          padding: buttonPadding,
           borderRadius: "9999px", fontWeight: 700,
           fontFamily: "Arial, Helvetica, sans-serif",
-          fontSize: isLarge ? "1rem" : "0.9rem",
+          fontSize: buttonFontSize,
           textDecoration: "none", transition: "opacity 0.2s",
           overflow: "hidden",
         }}
@@ -593,19 +525,26 @@ function SlideButton() {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function ServicesPage() {
-  const { isMobile, isTablet } = useBreakpoint();
-  const isLargeDesktop = typeof window !== "undefined" && window.innerWidth >= 1600;
+  const { isMobile, isTablet, isLaptop, isDesktop, is2K, is4K } = useBreakpoint();
 
+  // Responsive section padding with 6 breakpoints
   const sectionPadding = isMobile
     ? "3rem 1.25rem"
     : isTablet
-    ? "4rem 2rem"
-    : isLargeDesktop
-    ? "9rem 4rem"
-    : "6rem 2.5rem";
+    ? "4rem 1.75rem"
+    : isLaptop
+    ? "6rem 2rem"
+    : isDesktop
+    ? "7rem 2.5rem"
+    : is2K
+    ? "8.5rem 1.5rem"
+    : "10rem 0.75rem";
 
-  const visualScale = isLargeDesktop ? 1.5 : isTablet ? 0.9 : isMobile ? 0.82 : 1.3;
-  const maxWidth = "min(100rem, 96vw)";
+  // Visual scale increases for larger screens to fill space
+  const visualScale = isMobile ? 0.82 : isTablet ? 0.9 : isLaptop ? 1.3 : isDesktop ? 1.7 : is2K ? 2 : 3;
+  
+  // MaxWidth allows content to expand properly at higher resolutions
+  const maxWidth = isMobile ? "100%" : isTablet ? "100%" : isLaptop ? "min(100rem, 96vw)" : isDesktop ? "min(110rem, 94vw)" : is2K ? "min(130rem, 93vw)" : "min(160rem, 95vw)";
 
   return (
     <main style={{ background: "#000000", color: "white", overflowX: "hidden" }}>
@@ -613,15 +552,15 @@ export default function ServicesPage() {
 
         {/* ── Hero ── */}
         <section style={{
-          paddingTop: isMobile ? "8rem" : isTablet ? "9rem" : isLargeDesktop ? "14rem" : "11rem",
-          paddingBottom: isMobile ? "3rem" : isTablet ? "4rem" : isLargeDesktop ? "7rem" : "5rem",
-          paddingLeft: isMobile ? "1.25rem" : isTablet ? "2rem" : "4rem",
-          paddingRight: isMobile ? "1.25rem" : isTablet ? "2rem" : "4rem",
+          paddingTop:    isMobile ? "8rem"   : isTablet ? "9rem"  : isLaptop ? "10rem" : isDesktop ? "12rem" : is2K ? "14rem" : "16rem",
+          paddingBottom: isMobile ? "3rem"   : isTablet ? "4rem"  : isLaptop ? "5rem" : isDesktop ? "6rem" : is2K ? "7rem" : "8rem",
+          paddingLeft:   isMobile ? "1.25rem" : isTablet ? "1.75rem" : isLaptop ? "2rem" : isDesktop ? "2.5rem" : is2K ? "1.5rem" : "0.75rem",
+          paddingRight:  isMobile ? "1.25rem" : isTablet ? "1.75rem" : isLaptop ? "2rem" : isDesktop ? "2.5rem" : is2K ? "1.5rem" : "0.75rem",
           maxWidth, margin: "0 auto",
         }}>
           <FadeUp>
             <p style={{
-              fontSize: isMobile ? "0.7rem" : isLargeDesktop ? "0.9rem" : "0.75rem",
+              fontSize: isMobile ? "0.7rem" : isTablet ? "0.75rem" : isLaptop ? "0.8rem" : isDesktop ? "0.85rem" : is2K ? "0.9rem" : "0.95rem",
               letterSpacing: "0.3em", textTransform: "uppercase",
               fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400,
               color: "white", marginBottom: "1rem",
@@ -629,21 +568,27 @@ export default function ServicesPage() {
             <h1 style={{
               fontSize: isMobile
                 ? "clamp(2.5rem, 10vw, 3.5rem)"
-                : isLargeDesktop
-                ? "clamp(5rem, 7vw, 8rem)"
-                : "clamp(2.5rem, 7vw, 6rem)",
+                : isTablet
+                ? "clamp(2.5rem, 7vw, 4.5rem)"
+                : isLaptop
+                ? "clamp(3rem, 6vw, 5rem)"
+                : isDesktop
+                ? "clamp(4rem, 6vw, 6.5rem)"
+                : is2K
+                ? "clamp(5rem, 5.5vw, 7.5rem)"
+                : "clamp(6rem, 5vw, 8.5rem)",
               fontFamily: "'Coolvetica', sans-serif", fontWeight: 600,
               letterSpacing: "-0.02em", lineHeight: 1.05,
               color: "white", marginBottom: "1.5rem",
-              maxWidth: isLargeDesktop ? "1200px" : "700px",
+              maxWidth: isDesktop ? "1400px" : isLaptop ? "500px" : is2K ? "2560px" : is4K ? "3840px" : "700px",
             }}>
-              Services Built for<br />Impact
+              Services Built for Impact
             </h1>
             <p style={{
-              fontSize: isMobile ? "0.95rem" : isLargeDesktop ? "1.3rem" : "1.1rem",
+              fontSize: isMobile ? "0.95rem" : isTablet ? "1rem" : isLaptop ? "1.15rem" : isDesktop ? "1.25rem" : is2K ? "1.5rem" : "2rem",
               fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400,
               color: "rgba(255,255,255,0.8)",
-              maxWidth: isLargeDesktop ? "640px" : "520px",
+              maxWidth: isDesktop ? "1400px" : isLaptop ? "500px" : is2K ? "2560px" : is4K ? "3840px" : "700px",
               lineHeight: 1.75,
             }}>
               Everything you need to build a brand presence that commands attention — from raw footage to finished film.
@@ -658,17 +603,24 @@ export default function ServicesPage() {
         {/* ── Service Sections ── */}
         {services.map((service, i) => {
           const isEven = i % 2 === 0;
+          
+          // Dynamic grid gap scales with screen size
+          const gridGap = isMobile ? "2rem" : isTablet ? "2.5rem" : isLaptop ? "4rem" : isDesktop ? "5rem" : is2K ? "6rem" : "7.5rem";
+          
+          // Min height for visual containers scales with screen size
+          const minHeight = isMobile ? "240px" : isTablet ? "300px" : isLaptop ? "350px" : isDesktop ? "420px" : is2K ? "520px" : "620px";
+          
           return (
             <section key={service.title} style={{ padding: sectionPadding, maxWidth, margin: "0 auto" }}>
               <div style={{
                 display: "grid",
                 gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
-                gap: isMobile ? "2rem" : isTablet ? "3rem" : isLargeDesktop ? "7rem" : "5rem",
+                gap: gridGap,
                 alignItems: "center",
               }}>
                 {isMobile ? (
                   <>
-                    <FadeUp delay={0.1}><ServiceText service={service} isLarge={false} /></FadeUp>
+                    <FadeUp delay={0.1}><ServiceText service={service} isLarge={false} isMobile={isMobile} isTablet={isTablet} isLaptop={isLaptop} isDesktop={isDesktop} is2K={is2K} is4K={is4K} /></FadeUp>
                     <FadeUp delay={0.2}>
                       <div style={{ display: "flex", justifyContent: "center", transform: `scale(${visualScale})`, transformOrigin: "center top", marginBottom: "-2rem" }}>
                         <ServiceVisual service={service} />
@@ -678,18 +630,18 @@ export default function ServicesPage() {
                 ) : isEven ? (
                   <>
                     <FadeUp delay={0.1}>
-                      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: isLargeDesktop ? "420px" : "280px", position: "relative" }}>
+                      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight, position: "relative" }}>
                         <div style={{ position: "absolute", inset: 0, borderRadius: "24px", background: "radial-gradient(ellipse, rgba(3,192,74,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />
                         <ServiceVisual service={service} scale={visualScale} />
                       </div>
                     </FadeUp>
-                    <FadeUp delay={0.2}><ServiceText service={service} isLarge={!isMobile && !isTablet} /></FadeUp>
+                    <FadeUp delay={0.2}><ServiceText service={service} isLarge={!isMobile && !isTablet} isMobile={isMobile} isTablet={isTablet} isLaptop={isLaptop} isDesktop={isDesktop} is2K={is2K} is4K={is4K} /></FadeUp>
                   </>
                 ) : (
                   <>
-                    <FadeUp delay={0.2}><ServiceText service={service} isLarge={!isMobile && !isTablet} /></FadeUp>
+                    <FadeUp delay={0.2}><ServiceText service={service} isLarge={!isMobile && !isTablet} isMobile={isMobile} isTablet={isTablet} isLaptop={isLaptop} isDesktop={isDesktop} is2K={is2K} is4K={is4K} /></FadeUp>
                     <FadeUp delay={0.1}>
-                      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: isLargeDesktop ? "420px" : "280px", position: "relative" }}>
+                      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight, position: "relative" }}>
                         <div style={{ position: "absolute", inset: 0, borderRadius: "24px", background: "radial-gradient(ellipse, rgba(3,192,74,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />
                         <ServiceVisual service={service} scale={visualScale} />
                       </div>
@@ -697,8 +649,9 @@ export default function ServicesPage() {
                   </>
                 )}
               </div>
+
               {i < services.length - 1 && (
-                <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", marginTop: isMobile ? "3rem" : isTablet ? "4rem" : isLargeDesktop ? "9rem" : "6rem" }} />
+                <div style={{ height: "1px", background: "rgba(255,255,255,0.06)", marginTop: isMobile ? "3rem" : isTablet ? "4rem" : isLaptop ? "6rem" : isDesktop ? "7rem" : is2K ? "8.5rem" : "10rem" }} />
               )}
             </section>
           );
@@ -711,13 +664,13 @@ export default function ServicesPage() {
         }}>
           <FadeUp>
             <p style={{
-              fontSize: isLargeDesktop ? "0.9rem" : "0.75rem",
+              fontSize: isMobile ? "0.7rem" : isTablet ? "0.75rem" : isLaptop ? "0.8rem" : isDesktop ? "0.85rem" : is2K ? "0.9rem" : "2rem",
               letterSpacing: "0.3em", textTransform: "uppercase",
               fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400,
               color: "white", marginBottom: "1rem",
             }}>Ready to Start?</p>
             <h2 style={{
-              fontSize: isLargeDesktop ? "clamp(3rem, 5vw, 5rem)" : "clamp(2rem, 4vw, 3.5rem)",
+              fontSize : is4K ? "clamp(8rem, 3.2vw, 4.5rem)" : is2K ? "clamp(2.8rem, 3vw, 4rem)" : isDesktop ? "clamp(2.5rem, 2.8vw, 3.8rem)" : isLaptop ? "clamp(2.5rem, 2.8vw, 3.8rem)" : "clamp(2rem, 3.5vw, 3rem)",
               fontFamily: "'Coolvetica', sans-serif", fontWeight: 600,
               letterSpacing: "-0.02em", lineHeight: 1.1,
               color: "white", marginBottom: "1.25rem",
@@ -725,10 +678,10 @@ export default function ServicesPage() {
               Let's Create Something<br />Extraordinary
             </h2>
             <p style={{
-              fontSize: isLargeDesktop ? "1.2rem" : "1rem",
+              fontSize: isMobile ? "0.95rem" : isTablet ? "1rem" : isLaptop ? "1.1rem" : isDesktop ? "1.2rem" : is2K ? "1.35rem" : "2rem",
               fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400,
               color: "rgba(255,255,255,0.7)",
-              maxWidth: isLargeDesktop ? "560px" : "440px",
+              maxWidth: is4K ? "1000px" :                      isDesktop ? "600px" : isLaptop ? "520px" : "440px",
               margin: "0 auto 2.5rem", lineHeight: 1.7,
             }}>
               Book a free 30-minute strategy call. Tell us about your content or brand and let's build something powerful together.

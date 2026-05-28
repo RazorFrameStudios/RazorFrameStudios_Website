@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useBreakpoint } from "../hooks/useBreakpoint";
 
 const GLOW_GREEN = "0 0 20px rgba(3,192,74,0.7), 0 0 60px rgba(3,192,74,0.3)";
 const GLOW_WHITE = "0 0 40px rgba(3,192,74,0.2), 0 0 100px rgba(3,192,74,0.1)";
@@ -9,6 +10,36 @@ const GLOW_WHITE = "0 0 40px rgba(3,192,74,0.2), 0 0 100px rgba(3,192,74,0.1)";
 export default function PageLoader() {
   const [loading, setLoading] = useState(true);
   const [cacheBust, setCacheBust] = useState<number | null>(null);
+  const { isMobile, isTablet, isLaptop, isDesktop, is2K, is4K } = useBreakpoint();
+
+  // ── Responsive spacing ──────────────────────────────────────────────────────
+  const taglineMarginTop = isMobile
+    ? "0.75rem"  : isTablet
+    ? "0.85rem"  : isLaptop
+    ? "1rem"     : isDesktop
+    ? "1.25rem"  : is2K
+    ? "1.5rem"   : "2rem";
+
+  const progressBarBottom = isMobile
+    ? "-2rem"    : isTablet
+    ? "-2.25rem" : isLaptop
+    ? "-2.5rem"  : isDesktop
+    ? "-2.75rem" : is2K
+    ? "-3.25rem" : "-4rem";
+
+  const progressBarHeight = isMobile
+    ? "1px"      : isTablet
+    ? "1.25px"   : isLaptop
+    ? "1.5px"    : isDesktop
+    ? "1.75px"   : is2K
+    ? "2px"      : "2.5px";
+
+  const containerGap = isMobile
+    ? "0" : isTablet
+    ? "0.25rem" : isLaptop
+    ? "0.5rem" : isDesktop
+    ? "0.75rem" : is2K
+    ? "1rem" : "1.25rem";
 
   useEffect(() => {
     setCacheBust(Date.now());
@@ -29,6 +60,7 @@ export default function PageLoader() {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.6, ease: "easeInOut" }}
         >
+          {/* Background video */}
           <video
             autoPlay
             muted
@@ -42,7 +74,17 @@ export default function PageLoader() {
               type="video/mp4"
             />
           </video>
-          <div style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center" }}>
+
+          {/* Content container */}
+          <div
+            style={{
+              position: "relative",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: containerGap,
+            }}
+          >
             {/* Brand name */}
             <motion.div
               initial={{ y: 60, opacity: 0 }}
@@ -71,7 +113,7 @@ export default function PageLoader() {
                 fontSize: "clamp(0.65rem, 1.2vw, 0.85rem)",
                 letterSpacing: "0.35em",
                 textTransform: "uppercase",
-                marginTop: "1rem",
+                marginTop: taglineMarginTop,
               }}
             >
               Digital Content Agency
@@ -81,9 +123,9 @@ export default function PageLoader() {
             <motion.div
               style={{
                 position: "absolute",
-                bottom: "-2.5rem",
+                bottom: progressBarBottom,
                 left: 0,
-                height: "1.5px",
+                height: progressBarHeight,
                 background: "white",
                 width: "0%",
                 borderRadius: "9999px",

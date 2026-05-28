@@ -46,7 +46,6 @@ function WorkThumbnail({
   item,
 }: {
   item: typeof works[0];
-  isLargeDesktop: boolean;
 }) {
   const hasVideo = !!item.videoUrl;
   const youtubeId = hasVideo ? getYouTubeId(item.videoUrl) : "";
@@ -203,19 +202,7 @@ function FadeUp({
 }
 
 function WorkPageContent() {
-  const { isMobile, isTablet } = useBreakpoint();
-
-  const [isLargeDesktop, setIsLargeDesktop] = useState(false);
-
-  useEffect(() => {
-    const check = () => setIsLargeDesktop(window.innerWidth >= 1600);
-
-    check();
-
-    window.addEventListener("resize", check);
-
-    return () => window.removeEventListener("resize", check);
-  }, []);
+  const { isMobile, isTablet, isLaptop, isDesktop, is2K, is4K } = useBreakpoint();
 
   const searchParams = useSearchParams();
 
@@ -232,27 +219,67 @@ function WorkPageContent() {
       ? works
       : works.filter((w) => w.category === activeCategory);
 
-  const maxWidth = "min(100rem, 96vw)";
+  const maxWidth = isMobile ? "100%" : isTablet ? "100%" : isLaptop ? "min(100rem, 96vw)" : isDesktop ? "min(110rem, 94vw)" : is2K ? "min(130rem, 93vw)" : "min(160rem, 95vw)";
 
+  // Responsive grid columns: 1 mobile, 2 tablet, 3 laptop, 4 desktop, 5 2K, 6 4K
   const gridCols = isMobile
     ? "1fr"
     : isTablet
     ? "repeat(2, 1fr)"
-    : "repeat(3, 1fr)";
+    : isLaptop
+    ? "repeat(3, 1fr)"
+    : isDesktop
+    ? "repeat(4, 1fr)"
+    : is2K
+    ? "repeat(5, 1fr)"
+    : "repeat(6, 1fr)";
 
+  // Responsive hero padding
   const heroPaddingTop = isMobile
-    ? "8rem"
+    ? "6rem"
     : isTablet
-    ? "9rem"
-    : isLargeDesktop
+    ? "8rem"
+    : isLaptop
+    ? "10rem"
+    : isDesktop
+    ? "12rem"
+    : is2K
     ? "14rem"
-    : "11rem";
+    : "16rem";
 
+  const heroPaddingBottom = isMobile ? "2rem" : isTablet ? "3rem" : isDesktop ? "4rem" : "5rem";
+
+  // Responsive horizontal padding: minimal for 4K to maximize content area
   const sectionPaddingH = isMobile
     ? "1.25rem"
     : isTablet
+    ? "1.75rem"
+    : isLaptop
     ? "2rem"
-    : "4rem";
+    : isDesktop
+    ? "1.5rem"
+    : is2K
+    ? "0.75rem"
+    : "0.5rem";
+
+  // Responsive heading size: scales from 2.5rem to 6.5rem
+  const heroFontSize = isMobile
+    ? "2.5rem"
+    : isTablet
+    ? "3.5rem"
+    : isLaptop
+    ? "4rem"
+    : isDesktop
+    ? "5rem"
+    : is2K
+    ? "6rem"
+    : "8rem";
+
+  // Responsive gap between grid items - scales with content
+  const gridGap = isMobile ? "1rem" : isTablet ? "1.25rem" : isLaptop ? "1.5rem" : isDesktop ? "1.75rem" : is2K ? "2.25rem" : "2.75rem";
+
+  // Responsive bottom padding - scales with content size
+  const sectionPaddingBottom = isMobile ? "5rem" : isTablet ? "6rem" : isLaptop ? "7rem" : isDesktop ? "8rem" : is2K ? "10rem" : "12rem";
 
   const isThumbnail = (item: typeof works[0]) =>
     item.category === "Thumbnails";
@@ -267,10 +294,11 @@ function WorkPageContent() {
       }}
     >
       <div style={{ position: "relative", zIndex: 1 }}>
+        {/* Hero Section */}
         <section
           style={{
             paddingTop: heroPaddingTop,
-            paddingBottom: isMobile ? "3rem" : "4rem",
+            paddingBottom: heroPaddingBottom,
             paddingLeft: sectionPaddingH,
             paddingRight: sectionPaddingH,
             maxWidth,
@@ -280,8 +308,9 @@ function WorkPageContent() {
           <FadeUp>
             <h1
               style={{
-                fontSize: isMobile ? "3rem" : "5rem",
+                fontSize: heroFontSize,
                 fontFamily: "'Coolvetica', sans-serif",
+                margin: 0,
               }}
             >
               Our Work
@@ -289,11 +318,12 @@ function WorkPageContent() {
           </FadeUp>
         </section>
 
+        {/* Category Filter */}
         <div
           style={{
             paddingLeft: sectionPaddingH,
             paddingRight: sectionPaddingH,
-            paddingBottom: "3rem",
+            paddingBottom: isMobile ? "2rem" : "3rem",
             maxWidth,
             margin: "0 auto",
           }}
@@ -319,6 +349,9 @@ function WorkPageContent() {
                     activeCategory === cat
                       ? "#03C04A"
                       : "rgba(255,255,255,0.45)",
+                  fontSize: is4K ? "2rem" : is2K ? "1.5rem" : isLaptop ? "1.2rem" : isMobile ? "0.875rem" : "1rem",
+                  whiteSpace: "nowrap",
+                  transition: "all 0.2s ease",
                 }}
               >
                 {cat}
@@ -327,11 +360,12 @@ function WorkPageContent() {
           </div>
         </div>
 
+        {/* Works Grid */}
         <div
           style={{
             paddingLeft: sectionPaddingH,
             paddingRight: sectionPaddingH,
-            paddingBottom: "8rem",
+            paddingBottom: sectionPaddingBottom,
             maxWidth,
             margin: "0 auto",
           }}
@@ -340,7 +374,7 @@ function WorkPageContent() {
             style={{
               display: "grid",
               gridTemplateColumns: gridCols,
-              gap: "1.5rem",
+              gap: gridGap,
             }}
           >
             {filtered.map((item) => (
@@ -356,20 +390,44 @@ function WorkPageContent() {
                     aspectRatio: "16/9",
                     background: "#111111",
                     cursor: isThumbnail(item) ? "default" : "pointer",
+                    transition: "transform 0.3s ease",
                   }}
+                  whileHover={!isThumbnail(item) ? { scale: 1.02 } : {}}
                 >
-                  <WorkThumbnail
-                    item={item}
-                    isLargeDesktop={isLargeDesktop}
-                  />
+                  <WorkThumbnail item={item} />
                 </motion.div>
 
-                <div style={{ marginTop: "1rem" }}>
-                  <p style={{ color: "#03C04A" }}>{item.category}</p>
+                <div style={{ marginTop: isMobile ? "0.75rem" : "1rem" }}>
+                  <p
+                    style={{
+                      color: "#03C04A",
+                      fontSize: is4K ? "1.3rem" : isMobile ? "0.875rem" : "1rem",
+                      margin: "0 0 0.25rem 0",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.05em",
+                    }}
+                  >
+                    {item.category}
+                  </p>
 
-                  <h3>{item.title}</h3>
+                  <h3
+                    style={{
+                      fontSize: is4K ? "1.7rem": is2K ? "1.4rem" : isMobile ? "0.875rem" : "1rem",
+                      margin: "0.5rem 0",
+                      fontWeight: 600,
+                    }}
+                  >
+                    {item.title}
+                  </h3>
 
-                  <p style={{ color: "rgba(255,255,255,0.5)" }}>
+                  <p
+                    style={{
+                      color: "rgba(255,255,255,0.5)",
+                      fontSize: is4K ? "1.2rem": is2K ? "1.1rem" : isMobile ? "0.875rem" : "1rem",
+                      margin: 0,
+                      lineHeight: 1.5,
+                    }}
+                  >
                     {item.description}
                   </p>
                 </div>

@@ -20,14 +20,87 @@ const NAV_LINKS = [
 export default function Navbar() {
   const [scrolled, setScrolled]   = useState(false);
   const [menuOpen, setMenuOpen]   = useState(false);
-  const { isMobile, isTablet }    = useBreakpoint();
-  const showMobileMenu            = isMobile || isTablet;
+  const { isMobile, isTablet, isLaptop, isDesktop, is2K, is4K } = useBreakpoint();
+
+  // Only phones + tablets get the hamburger
+  const showMobileMenu = isMobile || isTablet;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 30);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // ── Sizing tokens ──────────────────────────────────────────────────────────
+  const navPadH = isMobile
+    ? "1.25rem" : isTablet
+    ? "1.75rem" : isLaptop
+    ? "2rem"    : isDesktop
+    ? "2.5rem"  : is2K
+    ? "3rem"    : "4rem";
+
+  const navPadV = isMobile
+    ? "1rem"  : isTablet
+    ? "1.1rem": isLaptop
+    ? "1.25rem": isDesktop
+    ? "1.4rem" : is2K
+    ? "1.6rem" : "2rem";
+
+  // Logo height: collapsed (scrolled) vs expanded (top of page)
+  const logoHeightExpanded = isMobile
+    ? 28  : isTablet
+    ? 32  : isLaptop
+    ? 36  : isDesktop
+    ? 42  : is2K
+    ? 52  : 64;
+
+  const logoHeightScrolled = isMobile
+    ? 52  : isTablet
+    ? 58  : isLaptop
+    ? 68  : isDesktop
+    ? 80  : is2K
+    ? 96  : 120;
+
+  const brandFontSize = isMobile
+    ? "1.1rem"  : isTablet
+    ? "1.2rem"  : isLaptop
+    ? "1.35rem" : isDesktop
+    ? "1.5rem"  : is2K
+    ? "1.8rem"  : "2.2rem";
+
+  const linkFontSize = isLaptop
+    ? "0.9rem"  : isDesktop
+    ? "1rem"    : is2K
+    ? "1.15rem" : is4K
+    ? "1.4rem"  : "0.9rem";
+
+  const linkGap = isLaptop
+    ? "2rem"    : isDesktop
+    ? "2.5rem"  : is2K
+    ? "3rem"    : is4K
+    ? "3.75rem" : "2rem";
+
+  const ctaPad = isLaptop
+    ? "0.55rem 1.4rem"  : isDesktop
+    ? "0.65rem 1.6rem"  : is2K
+    ? "0.8rem 2rem"     : is4K
+    ? "1rem 2.5rem"     : "0.55rem 1.4rem";
+
+  const ctaFontSize = isLaptop
+    ? "0.85rem" : isDesktop
+    ? "0.9rem"  : is2K
+    ? "1.05rem" : is4K
+    ? "1.3rem"  : "0.85rem";
+
+  // Drawer sizing (mobile/tablet only)
+  const drawerPadH   = isTablet ? "3rem"   : "1.75rem";
+  const drawerPadBot = isTablet ? "2.5rem" : "2rem";
+  const drawerLinkFont  = isTablet ? "1.25rem" : "1.1rem";
+  const drawerLinkPadV  = isTablet ? "1.1rem"  : "0.95rem";
+  const drawerCtaPad    = isTablet ? "1rem 2.5rem" : "0.85rem 2rem";
+  const drawerCtaFont   = isTablet ? "1.05rem"     : "0.95rem";
+  const drawerCtaMT     = isTablet ? "2rem"         : "1.5rem";
+  const hamburgerSize   = isMobile ? "22px" : "26px";
 
   return (
     <>
@@ -37,19 +110,20 @@ export default function Navbar() {
         transition={{ duration: 0.6 }}
         style={{
           position: "fixed", top: 0, left: 0, width: "100%", zIndex: 50,
-          padding: "1.25rem 2rem",
+          padding: `${navPadV} ${navPadH}`,
           display: "flex", justifyContent: "space-between", alignItems: "center",
           transition: "background 0.5s, backdrop-filter 0.5s, border 0.5s",
           background: scrolled || menuOpen ? "rgba(0,0,0,0.9)" : "transparent",
           backdropFilter: scrolled || menuOpen ? "blur(12px)" : "none",
           borderBottom: scrolled ? "0.5px solid rgba(3,192,74,0.12)" : "none",
+          boxSizing: "border-box",
         }}
       >
         {/* Brand */}
         <Link href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: "0.6rem" }}>
           <motion.img
             src="/logo.png"
-            animate={{ height: scrolled ? 64 : 32 }}
+            animate={{ height: scrolled ? logoHeightScrolled : logoHeightExpanded }}
             transition={TRANSITION}
             style={{ width: "auto", objectFit: "contain", display: "block" }}
           />
@@ -58,9 +132,11 @@ export default function Navbar() {
             animate={{ opacity: scrolled ? 0 : 1, x: scrolled ? -12 : 0, width: scrolled ? 0 : "auto" }}
             transition={TRANSITION}
             style={{
-              fontSize: "1.35rem", fontWeight: 500,
+              fontSize: brandFontSize,
+              fontWeight: 500,
               color: "white",
-              letterSpacing: "0em", textShadow: GLOW_WHITE,
+              letterSpacing: "0em",
+              textShadow: GLOW_WHITE,
               margin: 0, overflow: "hidden", whiteSpace: "nowrap",
               pointerEvents: scrolled ? "none" : "auto",
             }}
@@ -71,13 +147,14 @@ export default function Navbar() {
 
         {/* Desktop nav links */}
         {!showMobileMenu && (
-          <div style={{ display: "flex", gap: "2rem" }}>
+          <div style={{ display: "flex", gap: linkGap }}>
             {NAV_LINKS.map(({ label, href }) => (
               <Link key={label} href={href}
                 style={{
-                  color: "rgba(255,255,255,0.6)", fontSize: "0.9rem",
+                  color: "rgba(255,255,255,0.6)",
+                  fontSize: linkFontSize,
                   fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400,
-                  textDecoration: "none", transition: "color 0.2s",
+                  textDecoration: "none", transition: "color 0.2s, text-shadow 0.2s",
                 }}
                 onMouseEnter={e => { e.currentTarget.style.color = "#03C04A"; e.currentTarget.style.textShadow = GLOW_GREEN; }}
                 onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.6)"; e.currentTarget.style.textShadow = "none"; }}
@@ -92,8 +169,9 @@ export default function Navbar() {
             className="btn-shimmer"
             style={{
               background: BTN_GREEN, color: "#fff",
-              padding: "0.55rem 1.4rem",
-              borderRadius: "9999px", fontWeight: 600, fontSize: "0.8rem",
+              padding: ctaPad,
+              borderRadius: "9999px", fontWeight: 600,
+              fontSize: ctaFontSize,
               fontFamily: "Arial, Helvetica, sans-serif",
               textDecoration: "none",
               boxShadow: "0 0 16px rgba(3,192,74,0.35)",
@@ -109,10 +187,7 @@ export default function Navbar() {
         {showMobileMenu && (
           <button
             onClick={() => setMenuOpen(o => !o)}
-            style={{
-              background: "none", border: "none", cursor: "pointer",
-              display: "flex", flexDirection: "column", gap: "5px", padding: "4px",
-            }}
+            style={{ background: "none", border: "none", cursor: "pointer", display: "flex", flexDirection: "column", gap: "5px", padding: "4px" }}
             aria-label="Toggle menu"
           >
             {[0, 1, 2].map(i => (
@@ -126,7 +201,7 @@ export default function Navbar() {
                     : { rotate: 0, y: 0, opacity: 1 }
                 }
                 style={{
-                  display: "block", width: "22px", height: "2px",
+                  display: "block", width: hamburgerSize, height: "2px",
                   background: "#03C04A", borderRadius: "2px", transformOrigin: "center",
                 }}
                 transition={{ duration: 0.25 }}
@@ -136,7 +211,7 @@ export default function Navbar() {
         )}
       </motion.nav>
 
-      {/* Mobile drawer */}
+      {/* Mobile / tablet drawer */}
       <AnimatePresence>
         {menuOpen && showMobileMenu && (
           <motion.div
@@ -148,7 +223,7 @@ export default function Navbar() {
               position: "fixed", top: "72px", left: 0, right: 0, zIndex: 49,
               background: "rgba(0,0,0,0.95)", backdropFilter: "blur(16px)",
               borderBottom: "0.5px solid rgba(3,192,74,0.15)",
-              padding: "1.5rem 2rem 2rem",
+              padding: `1.5rem ${drawerPadH} ${drawerPadBot}`,
               display: "flex", flexDirection: "column",
             }}
           >
@@ -163,8 +238,10 @@ export default function Navbar() {
                   href={href}
                   onClick={() => setMenuOpen(false)}
                   style={{
-                    display: "block", padding: "1rem 0",
-                    color: "rgba(255,255,255,0.75)", fontSize: "1.1rem",
+                    display: "block",
+                    padding: `${drawerLinkPadV} 0`,
+                    color: "rgba(255,255,255,0.75)",
+                    fontSize: drawerLinkFont,
                     fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 600,
                     textDecoration: "none",
                     borderBottom: "0.5px solid rgba(255,255,255,0.06)",
@@ -180,10 +257,12 @@ export default function Navbar() {
               onClick={() => setMenuOpen(false)}
               className="btn-shimmer"
               style={{
-                display: "inline-block", marginTop: "1.5rem",
+                display: "inline-block",
+                marginTop: drawerCtaMT,
                 background: BTN_GREEN, color: "#fff",
-                padding: "0.85rem 2rem", borderRadius: "9999px",
-                fontWeight: 700, fontSize: "0.95rem",
+                padding: drawerCtaPad,
+                borderRadius: "9999px", fontWeight: 700,
+                fontSize: drawerCtaFont,
                 fontFamily: "Arial, Helvetica, sans-serif",
                 textDecoration: "none", textAlign: "center",
                 boxShadow: "0 0 20px rgba(3,192,74,0.35)",
