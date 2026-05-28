@@ -395,7 +395,7 @@ export default function Hero() {
                 autoPlay loop playsInline muted
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               >
-                <source src="/showreel.mp4" type="video/mp4" />
+                <source src="https://thzrymlstodkdybfzovu.supabase.co/storage/v1/object/public/Landing%20page%20videos/showreel.mp4" type="video/mp4" />
               </video>
               <MuteButton isMuted={isMuted} isVisible={isHoveringReel} onToggle={toggleMute} size={muteSize} />
             </div>
@@ -432,11 +432,6 @@ export default function Hero() {
                   gap: "0.6rem", pointerEvents: "none",
                 }}
               >
-                <div style={{ width: `${playSize}px`, height: `${playSize}px`, borderRadius: "50%", background: BTN_GREEN, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <svg width={playIconSize} height={playIconSize} viewBox="0 0 20 20" fill="none">
-                    <path d="M6 4L16 10L6 16V4Z" fill="#fff" />
-                  </svg>
-                </div>
                 <span style={{ fontSize: playLabelFont, fontFamily: "Arial, Helvetica, sans-serif", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>
                   Showreel 2025
                 </span>
