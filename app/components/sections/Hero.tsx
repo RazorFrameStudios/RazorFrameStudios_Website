@@ -420,7 +420,7 @@ export default function Hero() {
             >
               <video
                 ref={showreelRef}
-                autoPlay muted loop playsInline
+                autoPlay muted loop playsInline preload="auto"
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               >
                 <source src="https://thzrymlstodkdybfzovu.supabase.co/storage/v1/object/public/Landing%20page%20videos/showreel.mp4" type="video/mp4" />
