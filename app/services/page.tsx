@@ -301,8 +301,6 @@ function LongFormStack({ cards, scale = 1 }: { cards: typeof services[0]["cards"
   );
 }
 
-// ─── FIXED: AdsStack ──────────────────────────────────────────────────────────
-
 function AdsStack({ cards, scale = 1 }: { cards: typeof services[0]["cards"]; scale?: number }) {
   const W = Math.round(300 * scale);
   const H = Math.round(169 * scale);
@@ -365,16 +363,17 @@ function GrowthStrategyStack({ cards, scale = 1 }: { cards: typeof services[0]["
 }
 
 // ─── FIXED: ThumbnailsStack ───────────────────────────────────────────────────
-// 1. Reduced base card sizes so containerW at scale=0.82 stays under 320px
-// 2. Outer overflow:hidden flex wrapper prevents any remaining bleed
-// 3. scale prop is now passed from the mobile branch (see ServiceVisual usage)
+// Removed overflow:hidden from outer wrapper (was clipping hover).
+// Replaced with horizontal padding so cards don't bleed out of the screen.
+// Reduced base card sizes so containerW at scale=0.82 fits within ~290px.
 
 function ThumbnailsStack({ cards, scale = 1 }: { cards: typeof services[0]["cards"]; scale?: number }) {
-  const CW = Math.round(170 * scale);
-  const CH = Math.round(96  * scale);
-  const SW = Math.round(136 * scale);
-  const SH = Math.round(76  * scale);
-  const overlap = Math.round(20 * scale);
+  // Smaller base sizes so the stack fits on mobile without overflow:hidden
+  const CW = Math.round(150 * scale);
+  const CH = Math.round(85  * scale);
+  const SW = Math.round(118 * scale);
+  const SH = Math.round(67  * scale);
+  const overlap = Math.round(18 * scale);
   const containerW = SW * 2 + CW - overlap * 2 + Math.round(8 * scale);
   const containerH = CH + Math.round(28 * scale);
   const sideTop = Math.round(18 * scale);
@@ -384,7 +383,15 @@ function ThumbnailsStack({ cards, scale = 1 }: { cards: typeof services[0]["card
     { top: sideTop, left: SW - overlap + CW - overlap, width: SW, height: SH, rotate:  5, opacity: 1, zIndex: 1 },
   ];
   return (
-    <div style={{ width: "100%", overflow: "hidden", display: "flex", justifyContent: "center" }}>
+    // Padding absorbs the natural card bleed; no overflow:hidden needed so hover is never clipped
+    <div style={{
+      width: "100%",
+      display: "flex",
+      justifyContent: "center",
+      paddingLeft: "1rem",
+      paddingRight: "1rem",
+      boxSizing: "border-box",
+    }}>
       <div style={{ position: "relative", width: containerW, height: containerH, flexShrink: 0 }}>
         {configs.map((c, i) => (
           <motion.div
@@ -411,12 +418,6 @@ function ServiceVisual({ service, scale }: { service: typeof services[0]; scale?
   return null;
 }
 
-// ─── FIXED: ServiceText ───────────────────────────────────────────────────────
-// Added width:"100%", boxSizing:"border-box" to root div so it never exceeds
-// its grid cell on mobile. Added maxWidth:"100%" + wordBreak:"break-word" to
-// the tagline pill so long text wraps instead of overflowing. Features flex
-// container now has width:"100%" so wrapping is constrained to the cell width.
-
 function ServiceText({
   service, isLarge, isMobile, isTablet, isLaptop, isDesktop, is2K, is4K,
 }: {
@@ -442,10 +443,7 @@ function ServiceText({
   const buttonPadding  = isLarge ? (is4K ? "1.25rem 3rem" : is2K ? "1.15rem 2.5rem" : "1rem 2.25rem") : "0.8rem 1.75rem";
 
   return (
-    // FIX: width 100% + boxSizing border-box keeps the block inside its grid cell on mobile
     <div style={{ textAlign: "center", width: "100%", boxSizing: "border-box" }}>
-
-      {/* FIX: maxWidth 100% + wordBreak break-word prevents tagline pill from overflowing */}
       <div style={{
         display: "inline-flex", alignItems: "center", gap: "0.5rem",
         background: "rgba(3,192,74,0.08)", border: "0.5px solid rgba(3,192,74,0.2)",
@@ -460,7 +458,6 @@ function ServiceText({
         <span style={{
           color: "#03C04A", fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400,
           fontSize: taglineFontSize, letterSpacing: "0.2em", textTransform: "uppercase",
-          // FIX: allow tagline text to wrap on very narrow screens
           whiteSpace: isMobile ? "normal" : "nowrap",
           wordBreak: "break-word",
         }}>{service.tagline}</span>
@@ -471,7 +468,6 @@ function ServiceText({
         fontFamily: "'Coolvetica', sans-serif", fontWeight: 600,
         letterSpacing: "0.01em", lineHeight: 1.08,
         color: "white", marginBottom: h2MarginBottom,
-        // FIX: ensure heading never overflows its container
         wordBreak: "break-word",
         overflowWrap: "break-word",
       }}>{service.title}</h2>
@@ -483,13 +479,10 @@ function ServiceText({
         marginBottom: pMarginBottom,
         maxWidth: pMaxWidth,
         margin: "0 auto " + pMarginBottom,
-        // FIX: ensure description text wraps properly on mobile
         wordBreak: "break-word",
         overflowWrap: "break-word",
       }}>{service.description}</p>
 
-      {/* FIX: width 100% + boxSizing so the flex row is constrained to the cell,
-          forcing tags to wrap within the available width instead of overflowing */}
       <div style={{
         display: "flex", flexWrap: "wrap", gap: "0.5rem",
         marginBottom: featuresMarginBottom,
@@ -505,7 +498,6 @@ function ServiceText({
             borderRadius: "9999px",
             background: "rgba(255,255,255,0.05)", border: "0.5px solid rgba(255,255,255,0.1)",
             color: "rgba(255,255,255,0.6)", letterSpacing: "0.02em",
-            // FIX: prevent individual feature tags from overflowing
             maxWidth: "100%",
             wordBreak: "break-word",
             boxSizing: "border-box",
@@ -656,11 +648,9 @@ export default function ServicesPage() {
                         isDesktop={isDesktop} is2K={is2K} is4K={is4K}
                       />
                     </FadeUp>
-                    {/* FIX: pass scale prop so ThumbnailsStack (and all stacks) receive
-                        the scaled dimensions rather than relying on CSS transform which
-                        allocates full unscaled layout width before painting */}
                     <FadeUp delay={0.2}>
-                      <div style={{ display: "flex", justifyContent: "center", transformOrigin: "center top", marginBottom: "-2rem" }}>
+                      {/* overflow:visible so hover scale isn't clipped by this wrapper */}
+                      <div style={{ display: "flex", justifyContent: "center", transformOrigin: "center top", marginBottom: "-2rem", overflow: "visible" }}>
                         <ServiceVisual service={service} scale={visualScale} />
                       </div>
                     </FadeUp>
@@ -668,7 +658,7 @@ export default function ServicesPage() {
                 ) : isEven ? (
                   <>
                     <FadeUp delay={0.1}>
-                      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight, position: "relative" }}>
+                      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight, position: "relative", overflow: "visible" }}>
                         <div style={{ position: "absolute", inset: 0, borderRadius: "24px", background: "radial-gradient(ellipse, rgba(3,192,74,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />
                         <ServiceVisual service={service} scale={visualScale} />
                       </div>
@@ -691,7 +681,7 @@ export default function ServicesPage() {
                       />
                     </FadeUp>
                     <FadeUp delay={0.1}>
-                      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight, position: "relative" }}>
+                      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight, position: "relative", overflow: "visible" }}>
                         <div style={{ position: "absolute", inset: 0, borderRadius: "24px", background: "radial-gradient(ellipse, rgba(3,192,74,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />
                         <ServiceVisual service={service} scale={visualScale} />
                       </div>
