@@ -1,19 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { pool } from "@/lib/db";
 
-// Working hours config — edit these to change availability
-const WORK_DAYS   = [1, 2, 3, 4, 5]; // Mon–Fri (0=Sun, 6=Sat)
-const START_HOUR  = 11;               // 11:00 AM
-const END_HOUR    = 18;               // 6:00 PM
-const SLOT_MINS   = 30;               // 30-minute slots
+const WORK_DAYS  = [1, 2, 3, 4, 5];
+const START_HOUR = 11;
+const END_HOUR   = 18;
+const SLOT_MINS  = 30;
 
 function generateSlots(): string[] {
   const slots: string[] = [];
   for (let h = START_HOUR; h < END_HOUR; h++) {
     for (let m = 0; m < 60; m += SLOT_MINS) {
-      const hh = String(h).padStart(2, "0");
-      const mm = String(m).padStart(2, "0");
-      slots.push(`${hh}:${mm}`);
+      slots.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
     }
   }
   return slots;
@@ -21,58 +18,50 @@ function generateSlots(): string[] {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const date = searchParams.get("date"); // "YYYY-MM-DD"
+  const date        = searchParams.get("date");
+  const localHour   = searchParams.get("localHour");
+  const localMinute = searchParams.get("localMinute");
 
   if (!date) {
     return NextResponse.json({ error: "date param required" }, { status: 400 });
   }
 
-  // Check if the date is a working day
   const dayOfWeek = new Date(date + "T00:00:00").getDay();
   if (!WORK_DAYS.includes(dayOfWeek)) {
     return NextResponse.json({ slots: [] });
   }
 
-  // Don't allow past dates
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const [y, mo, d] = date.split("-").map(Number);
   const parsed = new Date(y, mo - 1, d);
+
   if (parsed < today) {
     return NextResponse.json({ slots: [] });
   }
 
-  // Fetch already-booked slots for this date
   const result = await pool.query(
     `SELECT time_slot::text FROM bookings WHERE date = $1 AND status = 'confirmed'`,
     [date]
   );
-
-  const booked = new Set(
-    result.rows.map((r) => r.time_slot.slice(0, 5)) // "HH:MM"
-  );
+  const booked = new Set(result.rows.map((r) => r.time_slot.slice(0, 5)));
 
   let allSlots = generateSlots();
 
-  // FIX: If the selected date is TODAY, filter out past times
-  const now = new Date();
   const isToday = parsed.getTime() === today.getTime();
-  
+
   if (isToday) {
-    const currentHour = now.getHours();
-    const currentMinute = now.getMinutes();
-    
+    // Use client's local time if provided, otherwise fall back to server time
+    const currentHour   = localHour   !== null ? Number(localHour)   : new Date().getHours();
+    const currentMinute = localMinute !== null ? Number(localMinute) : new Date().getMinutes();
+    const currentTime   = currentHour * 60 + currentMinute;
+
     allSlots = allSlots.filter((slot) => {
       const [slotHour, slotMinute] = slot.split(":").map(Number);
-      const slotTime = slotHour * 60 + slotMinute;
-      const currentTime = currentHour * 60 + currentMinute;
-      
-      // Only show slots that are at least 30 minutes in the future
-      return slotTime > currentTime + 30;
+      return (slotHour * 60 + slotMinute) > currentTime + 30;
     });
   }
 
   const available = allSlots.filter((s) => !booked.has(s));
-
   return NextResponse.json({ slots: available });
 }

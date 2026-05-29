@@ -59,7 +59,6 @@ function StepDot({ n, active, done, size }: { n: number; active: boolean; done: 
 export default function BookingPage() {
   const { isMobile, isTablet, isLaptop, isDesktop, is2K, is4K } = useBreakpoint();
 
-  // ── Layout / container ──────────────────────────────────────────────────────
   const maxWidth = isMobile
     ? "100%"
     : isTablet
@@ -76,7 +75,6 @@ export default function BookingPage() {
   const containerPadBot = isMobile ? "3rem"   : isTablet ? "4rem"   : isLaptop ? "5rem" : isDesktop ? "6rem"  : is2K ? "8rem"  : "10rem";
   const containerPadH   = isMobile ? "1.25rem": isTablet ? "1.75rem": isLaptop ? "2rem" : isDesktop ? "2.5rem": is2K ? "1.5rem": "0.75rem";
 
-  // ── Typography ──────────────────────────────────────────────────────────────
   const headingSize = isMobile
     ? "clamp(1.8rem, 7vw, 2.4rem)"
     : isTablet
@@ -92,16 +90,13 @@ export default function BookingPage() {
   const labelSize = isMobile ? "0.68rem" : isTablet ? "0.75rem" : isLaptop ? "0.85rem" : isDesktop ? "0.9rem" : is2K ? "1rem" : "1.3rem";
   const bodySize  = isMobile ? "0.88rem" : isTablet ? "0.95rem" : isLaptop ? "1rem"    : isDesktop ? "1.1rem" : is2K ? "1.25rem" : "1.6rem";
 
-  // ── Cards ───────────────────────────────────────────────────────────────────
   const cardPad    = isMobile ? "1.1rem" : isTablet ? "1.5rem" : isLaptop ? "2rem" : isDesktop ? "2.5rem" : is2K ? "3rem" : "4rem";
   const cardRadius = isMobile ? "12px"   : isTablet ? "14px"   : isLaptop ? "16px" : isDesktop ? "20px"   : is2K ? "24px" : "28px";
 
-  // ── Step indicator ─────────────────────────────────────────────────────────
   const dotSize      = isMobile ? 26 : isTablet ? 30 : isLaptop ? 36 : isDesktop ? 42 : is2K ? 52 : 64;
   const connectorW   = isMobile ? "18px" : isTablet ? "32px" : isLaptop ? "48px" : isDesktop ? "64px" : is2K ? "80px" : "100px";
   const stepLabelSize= isMobile ? "0.75rem" : isTablet ? "0.82rem" : isLaptop ? "0.9rem" : isDesktop ? "1rem" : is2K ? "1.2rem" : "1.5rem";
 
-  // ── Calendar ────────────────────────────────────────────────────────────────
   const calCellPadV    = isMobile ? "0.38rem" : isTablet ? "0.5rem"  : isLaptop ? "0.65rem" : isDesktop ? "0.8rem"  : is2K ? "1rem"   : "1.3rem";
   const calCellFont    = isMobile ? "0.78rem" : isTablet ? "0.86rem" : isLaptop ? "0.95rem" : isDesktop ? "1.05rem" : is2K ? "1.2rem" : "1.5rem";
   const calHeaderFont  = isMobile ? "0.62rem" : isTablet ? "0.68rem" : isLaptop ? "0.75rem" : isDesktop ? "0.82rem" : is2K ? "0.95rem": "1.2rem";
@@ -110,14 +105,12 @@ export default function BookingPage() {
   const calNavFont     = isMobile ? "1rem"    : isTablet ? "1.2rem"  : isLaptop ? "1.4rem"  : isDesktop ? "1.6rem"  : is2K ? "2rem"   : "2.5rem";
   const calCellRadius  = isMobile ? "8px"     : isTablet ? "9px"     : isLaptop ? "10px"    : isDesktop ? "12px"    : is2K ? "14px"   : "16px";
 
-  // ── Time slots ──────────────────────────────────────────────────────────────
   const slotCols    = isLaptop || isDesktop || is2K || is4K ? "1fr 1fr 1fr" : "1fr 1fr";
   const slotGap     = isMobile ? "0.4rem" : isTablet ? "0.5rem" : isLaptop ? "0.6rem" : isDesktop ? "0.7rem" : is2K ? "0.9rem" : "1.1rem";
   const slotFont    = isMobile ? "0.82rem" : isTablet ? "0.9rem" : isLaptop ? "0.95rem" : isDesktop ? "1.05rem" : is2K ? "1.2rem" : "1.5rem";
   const slotPad     = isMobile ? "0.55rem 0.7rem" : isTablet ? "0.65rem 0.85rem" : isLaptop ? "0.75rem 1rem" : isDesktop ? "0.9rem 1.2rem" : is2K ? "1.1rem 1.5rem" : "1.4rem 1.8rem";
   const slotMaxH    = isMobile ? "280px" : isTablet ? "340px" : isLaptop ? "400px" : isDesktop ? "480px" : is2K ? "560px" : "680px";
 
-  // ── Form / confirm ──────────────────────────────────────────────────────────
   const formMaxW      = isMobile ? "100%" : isTablet ? "min(640px,100%)" : isLaptop ? "min(800px,100%)" : isDesktop ? "min(960px,100%)" : is2K ? "min(1100px,100%)" : "min(1300px,100%)";
   const confirmMaxW   = isMobile ? "100%" : isTablet ? "min(560px,100%)" : isLaptop ? "min(680px,100%)" : isDesktop ? "min(800px,100%)" : is2K ? "min(960px,100%)" : "min(1100px,100%)";
   const inputPad      = isMobile ? "0.75rem 0.9rem" : isTablet ? "0.85rem 1rem" : isLaptop ? "0.95rem 1.1rem" : isDesktop ? "1.1rem 1.25rem" : is2K ? "1.3rem 1.5rem" : "1.6rem 1.8rem";
@@ -126,24 +119,20 @@ export default function BookingPage() {
   const textareaMinH  = isMobile ? "100px" : isTablet ? "110px" : isLaptop ? "130px" : isDesktop ? "160px" : is2K ? "190px" : "220px";
   const summaryFont   = isMobile ? "1rem" : isTablet ? "1.1rem" : isLaptop ? "1.2rem" : isDesktop ? "1.4rem" : is2K ? "1.7rem" : "2.1rem";
 
-  // ── CTA / buttons ───────────────────────────────────────────────────────────
   const ctaPad    = isMobile ? "0.75rem 2rem" : isTablet ? "0.85rem 2.25rem" : isLaptop ? "0.95rem 2.5rem" : isDesktop ? "1.1rem 3rem" : is2K ? "1.3rem 3.5rem" : "1.6rem 4.5rem";
   const ctaFont   = isMobile ? "0.9rem" : isTablet ? "0.95rem" : isLaptop ? "1rem" : isDesktop ? "1.1rem" : is2K ? "1.3rem" : "1.6rem";
   const ctaMinW   = isMobile ? "140px" : isTablet ? "160px" : isLaptop ? "180px" : isDesktop ? "200px" : is2K ? "230px" : "280px";
   const ctaRadius = "9999px";
   const backBtnPad= isMobile ? "0.75rem 1.5rem" : isTablet ? "0.85rem 1.75rem" : isLaptop ? "0.95rem 2rem" : isDesktop ? "1.1rem 2.5rem" : is2K ? "1.3rem 3rem" : "1.6rem 3.5rem";
 
-  // ── Step 1 grid ─────────────────────────────────────────────────────────────
   const step1Cols  = isMobile || isTablet ? "1fr" : "1fr 1fr";
   const step1Gap   = isMobile ? "1.25rem" : isTablet ? "1.5rem" : isLaptop ? "2rem" : isDesktop ? "2.5rem" : is2K ? "3rem" : "4rem";
 
-  // ── Section header margins ───────────────────────────────────────────────────
   const headerMB   = isMobile ? "1.75rem" : isTablet ? "2rem" : isLaptop ? "2.5rem" : isDesktop ? "3rem" : is2K ? "3.5rem" : "4.5rem";
   const stepsMB    = isMobile ? "1.75rem" : isTablet ? "2rem" : isLaptop ? "2.5rem" : isDesktop ? "3rem" : is2K ? "3.5rem" : "4.5rem";
   const navMB      = isMobile ? "1.75rem" : isTablet ? "2rem" : isLaptop ? "2.5rem" : isDesktop ? "3rem" : is2K ? "3.5rem" : "4.5rem";
   const ctaMT      = isMobile ? "1.5rem"  : isTablet ? "1.75rem" : isLaptop ? "2rem" : isDesktop ? "2.25rem" : is2K ? "2.75rem" : "3.5rem";
 
-  // Success card sizing
   const successCheckSize = isMobile ? "72px" : isTablet ? "80px" : isLaptop ? "90px" : isDesktop ? "100px" : is2K ? "120px" : "150px";
   const successCheckFont = isMobile ? "2rem" : isTablet ? "2.2rem" : isLaptop ? "2.5rem" : isDesktop ? "2.8rem" : is2K ? "3.5rem" : "4.5rem";
   const successH2Font    = isMobile ? "1.6rem" : isTablet ? "1.8rem" : isLaptop ? "2rem" : isDesktop ? "2.4rem" : is2K ? "3rem" : "3.8rem";
@@ -165,10 +154,19 @@ export default function BookingPage() {
 
   useEffect(() => { setTimezone(Intl.DateTimeFormat().resolvedOptions().timeZone); }, []);
 
+  // ── FIXED: pass client's local hour & minute so Vercel (UTC) filters correctly ──
   useEffect(() => {
     if (!selectedDate) return;
     setLoadingSlots(true); setSlots([]); setSelectedTime(null);
-    fetch(`/api/bookings/availability?date=${selectedDate}`)
+
+    const now = new Date();
+    const params = new URLSearchParams({
+      date:        selectedDate,
+      localHour:   String(now.getHours()),
+      localMinute: String(now.getMinutes()),
+    });
+
+    fetch(`/api/bookings/availability?${params}`)
       .then(r => { if (!r.ok) throw new Error(); return r.json(); })
       .then(d => setSlots(d.slots ?? []))
       .catch(() => setSlots([]))
@@ -280,7 +278,6 @@ export default function BookingPage() {
           <p style={{ fontSize: labelSize, letterSpacing: "0.3em", textTransform: "uppercase", fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400, color: "white", marginBottom: isMobile ? "0.4rem" : "0.6rem" }}>
             Free 30-min Call
           </p>
-          {/* FIX: letterSpacing "-0.02em" → "0.01em", lineHeight 1.1 → 1.08 */}
           <h1 style={{ fontSize: headingSize, fontFamily: "'Coolvetica', sans-serif", fontWeight: 600, letterSpacing: "0.01em", lineHeight: 1.08, color: "white" }}>
             Book a Strategy Call
           </h1>
@@ -314,7 +311,6 @@ export default function BookingPage() {
                     <button onClick={nextMonth} style={{ background: "none", border: "none", color: "rgba(255,255,255,0.5)", fontSize: calNavFont, cursor: "pointer", padding: "0.25rem 0.5rem", lineHeight: 1 }}>›</button>
                   </div>
 
-                  {/* Day headers */}
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: calGap, marginBottom: isMobile ? "6px" : isTablet ? "7px" : isLaptop ? "8px" : "10px" }}>
                     {DAYS.map(d => (
                       <div key={d} style={{ textAlign: "center", fontSize: calHeaderFont, fontFamily: "Arial, Helvetica, sans-serif", color: "rgba(255,255,255,0.3)", padding: "4px 0" }}>
@@ -323,7 +319,6 @@ export default function BookingPage() {
                     ))}
                   </div>
 
-                  {/* Day cells */}
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: calGap }}>
                     {cells.map((day, i) => {
                       if (!day) return <div key={i} />;
@@ -458,7 +453,6 @@ export default function BookingPage() {
                   padding: isMobile ? "1.1rem 1.4rem" : isTablet ? "1.25rem 1.5rem" : isLaptop ? "1.4rem 1.75rem" : isDesktop ? "1.75rem 2rem" : is2K ? "2.1rem 2.4rem" : "2.6rem 3rem",
                   marginBottom: isMobile ? "1.25rem" : isTablet ? "1.5rem" : isLaptop ? "1.75rem" : isDesktop ? "2rem" : is2K ? "2.5rem" : "3rem",
                 }}>
-                  {/* FIX: letterSpacing "-0.02em" → "0.01em", lineHeight added as 1.08 */}
                   <p style={{ fontSize: summaryFont, fontFamily: "'Coolvetica', sans-serif", fontWeight: 400, letterSpacing: "0.01em", lineHeight: 1.08, marginBottom: "0.35rem" }}>
                     {selectedDate && new Date(selectedDate + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
                   </p>
@@ -512,7 +506,6 @@ export default function BookingPage() {
                   style={{ width: successCheckSize, height: successCheckSize, borderRadius: "50%", background: "rgba(3,192,74,0.12)", border: `2px solid ${GREEN}`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto", marginBottom: isMobile ? "1.5rem" : isTablet ? "1.75rem" : isLaptop ? "2rem" : isDesktop ? "2.25rem" : is2K ? "2.75rem" : "3.5rem", boxShadow: GLOW, fontSize: successCheckFont, color: GREEN }}
                 >✓</motion.div>
 
-                {/* FIX: letterSpacing "-0.02em" → "0.01em", lineHeight added as 1.08 */}
                 <h2 style={{ fontSize: successH2Font, fontFamily: "'Coolvetica', sans-serif", fontWeight: 400, letterSpacing: "0.01em", lineHeight: 1.08, marginBottom: "0.5rem" }}>
                   You're <span style={{ color: GREEN }}>Booked!</span>
                 </h2>
@@ -521,7 +514,6 @@ export default function BookingPage() {
                 </p>
 
                 <div style={{ background: "rgba(3,192,74,0.06)", border: "0.5px solid rgba(3,192,74,0.15)", borderRadius: isMobile ? "10px" : isTablet ? "11px" : isLaptop ? "12px" : isDesktop ? "14px" : is2K ? "16px" : "20px", padding: isMobile ? "1rem 1.25rem" : isTablet ? "1.1rem 1.4rem" : isLaptop ? "1.2rem 1.5rem" : isDesktop ? "1.4rem 1.75rem" : is2K ? "1.7rem 2.1rem" : "2.1rem 2.6rem", marginBottom: isMobile ? "1.75rem" : isTablet ? "2rem" : isLaptop ? "2.25rem" : isDesktop ? "2.5rem" : is2K ? "3rem" : "3.75rem" }}>
-                  {/* FIX: letterSpacing "-0.02em" → "0.01em", lineHeight added as 1.08 */}
                   <p style={{ fontFamily: "'Coolvetica', sans-serif", fontWeight: 400, letterSpacing: "0.01em", lineHeight: 1.08, marginBottom: "0.25rem", fontSize: isMobile ? "0.95rem" : isTablet ? "1rem" : isLaptop ? "1.05rem" : isDesktop ? "1.15rem" : is2K ? "1.35rem" : "1.7rem" }}>
                     {selectedDate && new Date(selectedDate + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
                   </p>

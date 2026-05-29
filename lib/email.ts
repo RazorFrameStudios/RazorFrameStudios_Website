@@ -4,7 +4,7 @@ import nodemailer from "nodemailer";
 function createTransporter() {
   return nodemailer.createTransport({
     host:   process.env.SMTP_HOST,
-    port:   Number(process.env.SMTP_PORT ?? 587),
+    port:   Number(process.env.SMTP_PORT ?? 465),
     secure: process.env.SMTP_SECURE === "true",
     auth: {
       user: process.env.SMTP_USER,
@@ -12,17 +12,6 @@ function createTransporter() {
     },
   });
 }
-
-// Verify connection on startup
-const testTransporter = createTransporter();
-testTransporter.verify((error, success) => {
-  if (error) {
-    console.error("❌ SMTP transporter verification failed:", error.message);
-  } else if (success) {
-    console.log("✅ SMTP transporter ready and verified");
-  }
-  testTransporter.close();
-});
 
 interface BookingEmailData {
   name:     string;
