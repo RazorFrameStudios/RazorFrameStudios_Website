@@ -14,7 +14,7 @@ interface BookingEmailData {
 // ── Email to client ──────────────────────────────────────────
 export async function sendClientConfirmation(data: BookingEmailData) {
   const { data: result, error } = await resend.emails.send({
-    from:    "RazorFrame Studios <onboarding@resend.dev>", // replace with your verified domain later
+    from:    "RazorFrame Studios <hello@razorframestudios.in>",
     to:      data.email,
     subject: "Your call with RazorFrame Studios is confirmed ✅",
     html: `
@@ -60,7 +60,7 @@ export async function sendClientConfirmation(data: BookingEmailData) {
 // ── Email to owner ───────────────────────────────────────────
 export async function sendOwnerNotification(data: BookingEmailData) {
   const { data: result, error } = await resend.emails.send({
-    from:    "RazorFrame Bookings <onboarding@resend.dev>", // replace with your verified domain later
+    from:    "RazorFrame Bookings <bookings@razorframestudios.in>", 
     to:      process.env.OWNER_EMAIL!,
     subject: `📅 New booking — ${data.name} on ${data.date}`,
     html: `
