@@ -533,17 +533,6 @@ export default function Hero() {
               >
                 <source src="https://thzrymlstodkdybfzovu.supabase.co/storage/v1/object/public/Landing%20page%20videos/SaaS%20RFS%20COMPRESSED.mp4" type="video/mp4" />
               </video>
-              <div
-                style={{
-                  position: "absolute", inset: 0, display: "flex",
-                  flexDirection: "column", alignItems: "center", justifyContent: "center",
-                  gap: "0.6rem", pointerEvents: "none",
-                }}
-              >
-                <span style={{ fontSize: playLabelFont, fontFamily: "Arial, Helvetica, sans-serif", letterSpacing: "0.2em", textTransform: "uppercase", color: "rgba(255,255,255,0.35)" }}>
-                  Showreel 2025
-                </span>
-              </div>
               <MuteButton isMuted={isMuted} isVisible={muteVisible} onToggle={toggleMute} size={muteSize} />
             </div>
           </motion.div>
