@@ -45,14 +45,14 @@ export async function POST(req: NextRequest) {
       details: details ?? "",
     };
 
-    Promise.all([
+    await Promise.all([
       sendClientConfirmation(emailData).catch((err) =>
         console.error("Client confirmation email failed:", err)
       ),
       sendOwnerNotification(emailData).catch((err) =>
         console.error("Owner notification email failed:", err)
       ),
-    ]).catch((err) => console.error("Email sending error:", err));
+    ]);
 
     return NextResponse.json({ success: true });
 
