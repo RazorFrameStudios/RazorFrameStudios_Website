@@ -31,10 +31,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Insert into DB — unique constraint handles double-booking
+    // FIX: Insert into DB with explicit status = 'confirmed'
     await pool.query(
-      `INSERT INTO bookings (name, email, date, time_slot, timezone, details)
-       VALUES ($1, $2, $3, $4, $5, $6)`,
+      `INSERT INTO bookings (name, email, date, time_slot, timezone, details, status)
+       VALUES ($1, $2, $3, $4, $5, $6, 'confirmed')`,
       [name, email, date, timeSlot, timezone, details ?? ""]
     );
 
@@ -47,13 +47,22 @@ export async function POST(req: NextRequest) {
       details:  details ?? "",
     };
 
-    // Send both emails concurrently
-    await Promise.all([
-      sendClientConfirmation(emailData),
-      sendOwnerNotification(emailData),
-    ]);
+    // FIX: Send emails in background (don't block response)
+    // Catch email errors separately so booking still succeeds
+    Promise.all([
+      sendClientConfirmation(emailData).catch((err) => {
+        console.error("Client confirmation email failed:", err);
+      }),
+      sendOwnerNotification(emailData).catch((err) => {
+        console.error("Owner notification email failed:", err);
+      }),
+    ]).catch((err) => {
+      console.error("Email sending error:", err);
+    });
 
+    // FIX: Return success immediately (before emails complete)
     return NextResponse.json({ success: true });
+
   } catch (err: any) {
     // Unique violation = slot already taken
     if (err.code === "23505") {
