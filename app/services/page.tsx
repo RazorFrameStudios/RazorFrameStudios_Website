@@ -311,22 +311,31 @@ function LongFormStack({ cards, scale = 1 }: { cards: typeof services[0]["cards"
   );
 }
 
+// ─── FIXED: AdsStack ──────────────────────────────────────────────────────────
+// Previously used top: -90 / top: 90 which caused vertical overflow on mobile.
+// Now uses a proper stacked layout with safe positive offsets and a container
+// tall enough to hold both cards without clipping.
+
 function AdsStack({ cards, scale = 1 }: { cards: typeof services[0]["cards"]; scale?: number }) {
   const W = Math.round(300 * scale);
   const H = Math.round(169 * scale);
-  const offset = Math.round(20 * scale);
+  const verticalSpacing = Math.round(30 * scale);
+  const containerH = H * 2 + verticalSpacing + Math.round(20 * scale);
+  const containerW = W + Math.round(40 * scale);
+
   const configs = [
-    { top: -90, left: -80, opacity: 1, rotate: -6 },
-    { top:  90, left:  80, opacity: 1, rotate:  6 },
+    { top: 0,                    left: Math.round(40 * scale), rotate: -4, zIndex: 1, opacity: 0.85 },
+    { top: H + verticalSpacing,  left: 0,                      rotate:  4, zIndex: 2, opacity: 1    },
   ];
+
   return (
-    <div style={{ position: "relative", width: W + offset * 2, height: H + Math.round(56 * scale) }}>
+    <div style={{ position: "relative", width: containerW, height: containerH }}>
       {configs.map((c, i) => (
         <motion.div
           key={i}
           whileHover={{ y: -20, scale: 1.1, opacity: 1, zIndex: 10, rotate: 0 }}
           transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
-          style={{ position: "absolute", top: c.top, left: c.left, opacity: c.opacity, rotate: c.rotate }}
+          style={{ position: "absolute", top: c.top, left: c.left, opacity: c.opacity, rotate: c.rotate, zIndex: c.zIndex }}
         >
           <VideoCard
             image={cards[i].image}
@@ -368,6 +377,11 @@ function GrowthStrategyStack({ cards, scale = 1 }: { cards: typeof services[0]["
   );
 }
 
+// ─── FIXED: ThumbnailsStack ───────────────────────────────────────────────────
+// Previously the computed containerW exceeded mobile viewport width causing
+// right-side bleed. Now wrapped in a width:100% overflow:hidden flex container
+// that clips and centers the stack safely within the viewport.
+
 function ThumbnailsStack({ cards, scale = 1 }: { cards: typeof services[0]["cards"]; scale?: number }) {
   const CW = Math.round(200 * scale);
   const CH = Math.round(113 * scale);
@@ -383,17 +397,19 @@ function ThumbnailsStack({ cards, scale = 1 }: { cards: typeof services[0]["card
     { top: sideTop, left: SW - overlap + CW - overlap,    width: SW, height: SH, rotate:  5, opacity: 1, zIndex: 1 },
   ];
   return (
-    <div style={{ position: "relative", width: containerW, height: containerH }}>
-      {configs.map((c, i) => (
-        <motion.div
-          key={i}
-          whileHover={{ y: -16, scale: 1.5, opacity: 1, rotate: 0, zIndex: 10 }}
-          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
-          style={{ position: "absolute", top: c.top, left: c.left, rotate: c.rotate, zIndex: c.zIndex, opacity: c.opacity, transformOrigin: "bottom center" }}
-        >
-          <ImageCard image={cards[i]?.image ?? ""} width={c.width} height={c.height} category="Thumbnails" />
-        </motion.div>
-      ))}
+    <div style={{ width: "100%", overflow: "hidden", display: "flex", justifyContent: "center" }}>
+      <div style={{ position: "relative", width: containerW, height: containerH, flexShrink: 0 }}>
+        {configs.map((c, i) => (
+          <motion.div
+            key={i}
+            whileHover={{ y: -16, scale: 1.5, opacity: 1, rotate: 0, zIndex: 10 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] as const }}
+            style={{ position: "absolute", top: c.top, left: c.left, rotate: c.rotate, zIndex: c.zIndex, opacity: c.opacity, transformOrigin: "bottom center" }}
+          >
+            <ImageCard image={cards[i]?.image ?? ""} width={c.width} height={c.height} category="Thumbnails" />
+          </motion.div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -444,7 +460,6 @@ function ServiceText({ service, isLarge, isMobile, isTablet, isLaptop, isDesktop
         <span style={{ color: "#03C04A", fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400, fontSize: taglineFontSize, letterSpacing: "0.2em", textTransform: "uppercase" }}>{service.tagline}</span>
       </div>
 
-      {/* FIX: letterSpacing "-0.02em" → "0.01em", lineHeight 1.1 → 1.08 */}
       <h2 style={{
         fontSize: h2FontSize,
         fontFamily: "'Coolvetica', sans-serif", fontWeight: 600,
@@ -528,7 +543,6 @@ function SlideButton() {
 export default function ServicesPage() {
   const { isMobile, isTablet, isLaptop, isDesktop, is2K, is4K } = useBreakpoint();
 
-  // Responsive section padding with 6 breakpoints
   const sectionPadding = isMobile
     ? "3rem 1.25rem"
     : isTablet
@@ -541,10 +555,8 @@ export default function ServicesPage() {
     ? "8.5rem 1.5rem"
     : "10rem 0.75rem";
 
-  // Visual scale increases for larger screens to fill space
   const visualScale = isMobile ? 0.82 : isTablet ? 0.9 : isLaptop ? 1.3 : isDesktop ? 1.7 : is2K ? 2 : 3;
   
-  // MaxWidth allows content to expand properly at higher resolutions
   const maxWidth = isMobile ? "100%" : isTablet ? "100%" : isLaptop ? "min(100rem, 96vw)" : isDesktop ? "min(110rem, 94vw)" : is2K ? "min(130rem, 93vw)" : "min(160rem, 95vw)";
 
   return (
@@ -566,7 +578,6 @@ export default function ServicesPage() {
               fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400,
               color: "white", marginBottom: "1rem",
             }}>What We Offer</p>
-            {/* FIX: letterSpacing "-0.02em" → "0.01em", lineHeight 1.05 → 1.08 */}
             <h1 style={{
               fontSize: isMobile
                 ? "clamp(2.5rem, 10vw, 3.5rem)"
@@ -606,10 +617,8 @@ export default function ServicesPage() {
         {services.map((service, i) => {
           const isEven = i % 2 === 0;
           
-          // Dynamic grid gap scales with screen size
           const gridGap = isMobile ? "2rem" : isTablet ? "2.5rem" : isLaptop ? "4rem" : isDesktop ? "5rem" : is2K ? "6rem" : "7.5rem";
           
-          // Min height for visual containers scales with screen size
           const minHeight = isMobile ? "240px" : isTablet ? "300px" : isLaptop ? "350px" : isDesktop ? "420px" : is2K ? "520px" : "620px";
           
           return (
@@ -671,7 +680,6 @@ export default function ServicesPage() {
               fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400,
               color: "white", marginBottom: "1rem",
             }}>Ready to Start?</p>
-            {/* FIX: letterSpacing "-0.02em" → "0.01em", lineHeight 1.1 → 1.08 */}
             <h2 style={{
               fontSize: is4K ? "clamp(8rem, 3.2vw, 4.5rem)" : is2K ? "clamp(2.8rem, 3vw, 4rem)" : isDesktop ? "clamp(2.5rem, 2.8vw, 3.8rem)" : isLaptop ? "clamp(2.5rem, 2.8vw, 3.8rem)" : "clamp(2rem, 3.5vw, 3rem)",
               fontFamily: "'Coolvetica', sans-serif", fontWeight: 600,
