@@ -169,12 +169,13 @@ export default function WhyChooseUs() {
             }}>
               Our Edge
             </p>
+            {/* FIX: letterSpacing changed from "-0.02em" → "0.01em", lineHeight nudged to 1.08 */}
             <h2 style={{
               fontSize: h2Size,
               fontFamily: "'Coolvetica', sans-serif",
               fontWeight: 600,
-              letterSpacing: "-0.02em",
-              lineHeight: 1.1,
+              letterSpacing: "0.01em",
+              lineHeight: 1.08,
               color: "white",
             }}>
               Why Choose Us
@@ -237,15 +238,15 @@ export default function WhyChooseUs() {
                     {icons[i] || "✦"}
                   </div>
 
-                  {/* Title */}
+                  {/* FIX: letterSpacing changed from "-0.02em" → "0.01em", lineHeight nudged to 1.08 */}
                   <h3 style={{
                     fontSize: cardTitleFont,
                     fontFamily: "'Coolvetica', sans-serif",
                     fontWeight: 600,
-                    letterSpacing: "-0.02em",
+                    letterSpacing: "0.01em",
+                    lineHeight: 1.08,
                     marginBottom: cardTitleMB,
                     color: "white",
-                    lineHeight: 1.2,
                   }}>
                     {item.title}
                   </h3>

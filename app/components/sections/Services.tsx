@@ -259,15 +259,16 @@ export default function Services() {
           }}>
             What We Do
           </p>
+          {/* FIX: letterSpacing changed from "-0.02em" → "0.01em", lineHeight nudged to 1.08 */}
           <h2 style={{
             fontSize: h2Size,
             fontFamily: "'Coolvetica', sans-serif", fontWeight: 600,
-            letterSpacing: "-0.02em", lineHeight: 1.1,
+            letterSpacing: "0.01em", lineHeight: 1.08,
             marginBottom: h2MB,
             color: "#ffffff",
             textAlign: isMobile ? "center" : "left",
           }}>
-            Explore Our, Services
+            Explore Our Services
           </h2>
         </ScrollReveal>
 
@@ -384,11 +385,11 @@ export default function Services() {
                   What We Offer
                 </p>
 
-                {/* Service title */}
+                {/* FIX: letterSpacing changed from "-0.02em" → "0.01em", lineHeight added */}
                 <h3 style={{
                   fontSize: descTitleFont,
                   fontFamily: "'Coolvetica', sans-serif", fontWeight: 400,
-                  letterSpacing: "-0.02em",
+                  letterSpacing: "0.01em", lineHeight: 1.08,
                   marginBottom: descTitleMB,
                   color: "#ffffff",
                 }}>

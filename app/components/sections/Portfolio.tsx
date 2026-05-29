@@ -228,7 +228,6 @@ export default function Portfolio() {
           position: "relative",
           paddingTop: paddingY,
           paddingBottom: paddingY,
-          // Horizontal padding on the section — same as Services
           paddingLeft: paddingH,
           paddingRight: paddingH,
           overflow: "hidden",
@@ -241,7 +240,7 @@ export default function Portfolio() {
           background: "linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 100%)",
         }} />
 
-        {/* Left fade — positioned relative to viewport edge, not padded container */}
+        {/* Left fade */}
         <div style={{
           position: "absolute", top: 0, left: 0,
           width: sideGradientW, height: "100%",
@@ -257,7 +256,7 @@ export default function Portfolio() {
           pointerEvents: "none", zIndex: 3,
         }} />
 
-        {/* ── Header — maxWidth container mirrors Services ── */}
+        {/* ── Header ── */}
         <div style={{ maxWidth, margin: "0 auto", position: "relative", zIndex: 2 }}>
           <ScrollReveal variant="fadeRight">
             <div style={{
@@ -281,12 +280,13 @@ export default function Portfolio() {
                 }}>
                   Selected Projects
                 </p>
+                {/* FIX: letterSpacing changed from "-0.02em" → "0.01em", lineHeight nudged to 1.08 */}
                 <h2 style={{
                   fontSize: h2Size,
                   fontFamily: "'Coolvetica', sans-serif",
                   fontWeight: 600,
-                  letterSpacing: "-0.02em",
-                  lineHeight: 1.1,
+                  letterSpacing: "0.01em",
+                  lineHeight: 1.08,
                   color: "#ffffff",
                 }}>
                   Our Work
@@ -313,12 +313,11 @@ export default function Portfolio() {
           </ScrollReveal>
         </div>
 
-        {/* ── Carousel — breaks out of padded container to fill full width ── */}
+        {/* ── Carousel ── */}
         <div style={{
           position: "relative",
           zIndex: 2,
           paddingTop: `${carouselPT}px`,
-          // Pull carousel to viewport edges, overcoming the section's horizontal padding
           marginLeft: `-${paddingH}`,
           marginRight: `-${paddingH}`,
         }}>

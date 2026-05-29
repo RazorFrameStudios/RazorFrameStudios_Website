@@ -280,7 +280,8 @@ export default function BookingPage() {
           <p style={{ fontSize: labelSize, letterSpacing: "0.3em", textTransform: "uppercase", fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400, color: "white", marginBottom: isMobile ? "0.4rem" : "0.6rem" }}>
             Free 30-min Call
           </p>
-          <h1 style={{ fontSize: headingSize, fontFamily: "'Coolvetica', sans-serif", fontWeight: 600, letterSpacing: "-0.02em", lineHeight: 1.1, color: "white" }}>
+          {/* FIX: letterSpacing "-0.02em" → "0.01em", lineHeight 1.1 → 1.08 */}
+          <h1 style={{ fontSize: headingSize, fontFamily: "'Coolvetica', sans-serif", fontWeight: 600, letterSpacing: "0.01em", lineHeight: 1.08, color: "white" }}>
             Book a Strategy Call
           </h1>
         </div>
@@ -457,7 +458,8 @@ export default function BookingPage() {
                   padding: isMobile ? "1.1rem 1.4rem" : isTablet ? "1.25rem 1.5rem" : isLaptop ? "1.4rem 1.75rem" : isDesktop ? "1.75rem 2rem" : is2K ? "2.1rem 2.4rem" : "2.6rem 3rem",
                   marginBottom: isMobile ? "1.25rem" : isTablet ? "1.5rem" : isLaptop ? "1.75rem" : isDesktop ? "2rem" : is2K ? "2.5rem" : "3rem",
                 }}>
-                  <p style={{ fontSize: summaryFont, fontFamily: "'Coolvetica', sans-serif", fontWeight: 400, marginBottom: "0.35rem" }}>
+                  {/* FIX: letterSpacing "-0.02em" → "0.01em", lineHeight added as 1.08 */}
+                  <p style={{ fontSize: summaryFont, fontFamily: "'Coolvetica', sans-serif", fontWeight: 400, letterSpacing: "0.01em", lineHeight: 1.08, marginBottom: "0.35rem" }}>
                     {selectedDate && new Date(selectedDate + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
                   </p>
                   <p style={{ color: GREEN, fontSize: isMobile ? "1rem" : isTablet ? "1.05rem" : isLaptop ? "1.1rem" : isDesktop ? "1.2rem" : is2K ? "1.4rem" : "1.8rem", fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 600, marginBottom: "0.35rem" }}>
@@ -510,7 +512,8 @@ export default function BookingPage() {
                   style={{ width: successCheckSize, height: successCheckSize, borderRadius: "50%", background: "rgba(3,192,74,0.12)", border: `2px solid ${GREEN}`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto", marginBottom: isMobile ? "1.5rem" : isTablet ? "1.75rem" : isLaptop ? "2rem" : isDesktop ? "2.25rem" : is2K ? "2.75rem" : "3.5rem", boxShadow: GLOW, fontSize: successCheckFont, color: GREEN }}
                 >✓</motion.div>
 
-                <h2 style={{ fontSize: successH2Font, fontFamily: "'Coolvetica', sans-serif", fontWeight: 400, letterSpacing: "-0.02em", marginBottom: "0.5rem" }}>
+                {/* FIX: letterSpacing "-0.02em" → "0.01em", lineHeight added as 1.08 */}
+                <h2 style={{ fontSize: successH2Font, fontFamily: "'Coolvetica', sans-serif", fontWeight: 400, letterSpacing: "0.01em", lineHeight: 1.08, marginBottom: "0.5rem" }}>
                   You're <span style={{ color: GREEN }}>Booked!</span>
                 </h2>
                 <p style={{ color: "rgba(255,255,255,0.5)", lineHeight: 1.7, fontSize: bodySize, fontFamily: "Arial, Helvetica, sans-serif", marginBottom: isMobile ? "1.75rem" : isTablet ? "2rem" : isLaptop ? "2.25rem" : isDesktop ? "2.5rem" : is2K ? "3rem" : "3.75rem" }}>
@@ -518,7 +521,8 @@ export default function BookingPage() {
                 </p>
 
                 <div style={{ background: "rgba(3,192,74,0.06)", border: "0.5px solid rgba(3,192,74,0.15)", borderRadius: isMobile ? "10px" : isTablet ? "11px" : isLaptop ? "12px" : isDesktop ? "14px" : is2K ? "16px" : "20px", padding: isMobile ? "1rem 1.25rem" : isTablet ? "1.1rem 1.4rem" : isLaptop ? "1.2rem 1.5rem" : isDesktop ? "1.4rem 1.75rem" : is2K ? "1.7rem 2.1rem" : "2.1rem 2.6rem", marginBottom: isMobile ? "1.75rem" : isTablet ? "2rem" : isLaptop ? "2.25rem" : isDesktop ? "2.5rem" : is2K ? "3rem" : "3.75rem" }}>
-                  <p style={{ fontFamily: "'Coolvetica', sans-serif", fontWeight: 400, marginBottom: "0.25rem", fontSize: isMobile ? "0.95rem" : isTablet ? "1rem" : isLaptop ? "1.05rem" : isDesktop ? "1.15rem" : is2K ? "1.35rem" : "1.7rem" }}>
+                  {/* FIX: letterSpacing "-0.02em" → "0.01em", lineHeight added as 1.08 */}
+                  <p style={{ fontFamily: "'Coolvetica', sans-serif", fontWeight: 400, letterSpacing: "0.01em", lineHeight: 1.08, marginBottom: "0.25rem", fontSize: isMobile ? "0.95rem" : isTablet ? "1rem" : isLaptop ? "1.05rem" : isDesktop ? "1.15rem" : is2K ? "1.35rem" : "1.7rem" }}>
                     {selectedDate && new Date(selectedDate + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}
                   </p>
                   <p style={{ color: GREEN, fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 600, fontSize: isMobile ? "0.9rem" : isTablet ? "0.95rem" : isLaptop ? "1rem" : isDesktop ? "1.1rem" : is2K ? "1.3rem" : "1.6rem" }}>

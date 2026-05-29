@@ -306,10 +306,13 @@ function WorkPageContent() {
           }}
         >
           <FadeUp>
+            {/* FIX: letterSpacing added as "0.01em", lineHeight added as 1.08 */}
             <h1
               style={{
                 fontSize: heroFontSize,
                 fontFamily: "'Coolvetica', sans-serif",
+                letterSpacing: "0.01em",
+                lineHeight: 1.08,
                 margin: 0,
               }}
             >

@@ -189,13 +189,13 @@ export default function Booking() {
             Let's Talk
           </p>
 
-          {/* Main heading */}
+          {/* FIX: letterSpacing changed from "-0.02em" → "0.01em", lineHeight nudged to 1.08 */}
           <h2 style={{
             fontSize: h2Size,
             fontFamily: "'Coolvetica', sans-serif",
             fontWeight: 600,
-            letterSpacing: "-0.02em",
-            lineHeight: 1.05,
+            letterSpacing: "0.01em",
+            lineHeight: 1.08,
             color: "white",
             marginBottom: headerMB,
           }}>

@@ -127,15 +127,17 @@ export default function Navbar() {
             transition={TRANSITION}
             style={{ width: "auto", objectFit: "contain", display: "block" }}
           />
+          {/* FIX: fontFamily set to Coolvetica, letterSpacing changed from "0em" → "0.01em", lineHeight set to 1.08 */}
           <motion.h1
-            className="font-sans"
             animate={{ opacity: scrolled ? 0 : 1, x: scrolled ? -12 : 0, width: scrolled ? 0 : "auto" }}
             transition={TRANSITION}
             style={{
               fontSize: brandFontSize,
+              fontFamily: "'Coolvetica', sans-serif",
               fontWeight: 500,
               color: "white",
-              letterSpacing: "0em",
+              letterSpacing: "0.01em",
+              lineHeight: 1.08,
               textShadow: GLOW_WHITE,
               margin: 0, overflow: "hidden", whiteSpace: "nowrap",
               pointerEvents: scrolled ? "none" : "auto",

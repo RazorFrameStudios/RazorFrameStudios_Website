@@ -151,6 +151,7 @@ export default function Footer() {
 
         {/* ── Brand ── */}
         <div>
+          {/* FIX: letterSpacing changed from "-0.02em" → "0.01em", lineHeight set to 1.08 */}
           <h3 style={{
             fontSize: brandFont,
             fontWeight: 600,
@@ -158,7 +159,8 @@ export default function Footer() {
             marginBottom: brandMB,
             color: "white",
             textShadow: GLOW_WHITE,
-            letterSpacing: "-0.02em",
+            letterSpacing: "0.01em",
+            lineHeight: 1.08,
           }}>
             RazorFrame Studios
           </h3>
@@ -169,7 +171,7 @@ export default function Footer() {
             fontFamily: "Arial, Helvetica, sans-serif",
             fontWeight: 400,
           }}>
-            Creating high-performing content for creators and brands.
+            Content Built To Perform.
           </p>
         </div>
 

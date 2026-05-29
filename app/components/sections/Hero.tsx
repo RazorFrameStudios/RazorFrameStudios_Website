@@ -2,11 +2,12 @@
 
 import { motion } from "framer-motion";
 import { useBreakpoint } from "../hooks/useBreakpoint";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 const BTN_GREEN  = "#1B5E34";
 const GLOW_WHITE = "0 0 30px rgba(3,192,74,0.15)";
 
+// FIX 1: Accept onClick on the wrapper div for touch support
 function MuteButton({
   isMuted,
   isVisible,
@@ -21,7 +22,10 @@ function MuteButton({
   const iconSize = Math.round(size * 0.44);
   return (
     <button
-      onClick={onToggle}
+      onClick={(e) => {
+        e.stopPropagation();
+        onToggle();
+      }}
       style={{
         position: "absolute",
         bottom: "12px",
@@ -37,10 +41,15 @@ function MuteButton({
         alignItems: "center",
         justifyContent: "center",
         cursor: "pointer",
+        // FIX 2: Always visible on mobile (touch devices have no hover),
+        //         hover-gated only on non-touch (pointer: fine) via opacity.
+        //         We handle this by always rendering but letting the parent
+        //         control visibility through `isVisible` only on non-touch.
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? "scale(1)" : "scale(0.85)",
         transition: "opacity 0.2s ease, transform 0.2s ease",
-        pointerEvents: isVisible ? "auto" : "none",
+        // Always allow pointer events so touch users can tap it
+        pointerEvents: "auto",
       }}
       aria-label={isMuted ? "Unmute" : "Mute"}
     >
@@ -65,15 +74,118 @@ export default function Hero() {
   const { isMobile, isTablet, isLaptop, isDesktop, is2K, is4K } = useBreakpoint();
 
   const showreelRef       = useRef<HTMLVideoElement>(null);
+  const showreelMobileRef = useRef<HTMLVideoElement>(null);
   const [isMuted, setIsMuted]               = useState(true);
   const [isHoveringReel, setIsHoveringReel] = useState(false);
 
+  // FIX 3: Detect touch device so the mute button is always visible on mobile/touch
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  useEffect(() => {
+    setIsTouchDevice(
+      "ontouchstart" in window || navigator.maxTouchPoints > 0
+    );
+  }, []);
+
+  // Initialize videos on mount with correct muted state
+  useEffect(() => {
+    const initVideo = (videoEl: HTMLVideoElement | null) => {
+      if (!videoEl) return;
+      videoEl.muted = isMuted;
+      videoEl.volume = isMuted ? 0 : 1;
+      console.log("Initialized video:", { muted: videoEl.muted, volume: videoEl.volume });
+    };
+    initVideo(showreelRef.current);
+    initVideo(showreelMobileRef.current);
+  }, []);
+
+  // FIX 4: More robust mute toggle with volume control and debugging
   const toggleMute = () => {
+    const next = !isMuted;
+    console.log("Toggle mute:", { from: isMuted, to: next });
+
     if (showreelRef.current) {
-      showreelRef.current.muted = !showreelRef.current.muted;
-      setIsMuted(showreelRef.current.muted);
+      showreelRef.current.muted = next;
+      showreelRef.current.volume = next ? 0 : 1;
+      if (next) {
+        showreelRef.current.setAttribute("muted", "");
+      } else {
+        showreelRef.current.removeAttribute("muted");
+      }
+      console.log("Desktop video muted:", showreelRef.current.muted, "volume:", showreelRef.current.volume);
     }
+    if (showreelMobileRef.current) {
+      showreelMobileRef.current.muted = next;
+      showreelMobileRef.current.volume = next ? 0 : 1;
+      if (next) {
+        showreelMobileRef.current.setAttribute("muted", "");
+      } else {
+        showreelMobileRef.current.removeAttribute("muted");
+      }
+      console.log("Mobile video muted:", showreelMobileRef.current.muted, "volume:", showreelMobileRef.current.volume);
+    }
+    setIsMuted(next);
   };
+
+  // FIX 5: Sync muted and volume on mount and when isMuted changes
+  useEffect(() => {
+    const syncVideo = (videoEl: HTMLVideoElement | null) => {
+      if (!videoEl) return;
+      
+      // Set both muted property and volume
+      videoEl.muted = isMuted;
+      videoEl.volume = isMuted ? 0 : 1;
+      
+      // Set/remove attribute
+      if (isMuted) {
+        videoEl.setAttribute("muted", "");
+      } else {
+        videoEl.removeAttribute("muted");
+      }
+      
+      console.log("Synced video:", { muted: videoEl.muted, volume: videoEl.volume });
+    };
+
+    syncVideo(showreelRef.current);
+    syncVideo(showreelMobileRef.current);
+  }, [isMuted]);
+
+  // FIX 6: Recover from stalls — if the video stalls for more than 3 s, replay it
+  useEffect(() => {
+    const refs = [showreelRef, showreelMobileRef];
+    const timers: ReturnType<typeof setTimeout>[] = [];
+
+    refs.forEach((r) => {
+      const el = r.current;
+      if (!el) return;
+
+      const onStall = () => {
+        const t = setTimeout(() => {
+          if (!el) return;
+          const time = el.currentTime;
+          el.load();           // re-fetch the segment
+          el.currentTime = time;
+          el.play().catch(() => {});
+        }, 3000);
+        timers.push(t);
+      };
+
+      const clearTimer = () => timers.forEach(clearTimeout);
+
+      el.addEventListener("stalled",  onStall);
+      el.addEventListener("waiting",  onStall);
+      el.addEventListener("playing",  clearTimer);
+      el.addEventListener("canplay",  clearTimer);
+
+      return () => {
+        el.removeEventListener("stalled",  onStall);
+        el.removeEventListener("waiting",  onStall);
+        el.removeEventListener("playing",  clearTimer);
+        el.removeEventListener("canplay",  clearTimer);
+      };
+    });
+
+    return () => timers.forEach(clearTimeout);
+  }, []);
 
   // ── Container ──────────────────────────────────────────────────────────────
   const maxWidth = isMobile
@@ -210,15 +322,11 @@ export default function Hero() {
     ? 42  : is2K
     ? 50  : 62;
 
-  // Play icon size (mobile overlay)
-  const playSize = isMobile
-    ? 40  : 48;
-
-  const playIconSize = isMobile
-    ? 16  : 20;
-
   const playLabelFont = isMobile
     ? "0.62rem" : "0.68rem";
+
+  // Mute button is visible on hover (desktop) or always (touch/mobile)
+  const muteVisible = isTouchDevice ? true : isHoveringReel;
 
   return (
     <section
@@ -227,7 +335,7 @@ export default function Hero() {
     >
       {/* Background video */}
       <video
-        autoPlay loop playsInline
+        autoPlay loop playsInline muted preload="auto"
         className="absolute inset-0 w-full h-full object-cover"
         style={{ opacity: 1, zIndex: 0 }}
       >
@@ -282,9 +390,9 @@ export default function Hero() {
               fontSize: h1Size,
               fontFamily: "'Coolvetica', sans-serif",
               fontWeight: 600,
-              lineHeight: 1.05,
-              letterSpacing: "-0.04em",
-              wordSpacing: "0.2rem",
+              lineHeight: 1.08,
+              letterSpacing: "0.01em",
+              wordSpacing: "0.05em",
               color: "white",
               textShadow: "0 0 40px rgba(3,192,74,0.15), 0 0 100px rgba(3,192,74,0.08)",
               marginBottom: h1MB,
@@ -390,14 +498,14 @@ export default function Hero() {
                 position: "relative",
               }}
             >
-              <video
+            <video
                 ref={showreelRef}
-                autoPlay loop playsInline muted preload="auto"
+                autoPlay loop playsInline preload="auto"
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               >
                 <source src="https://thzrymlstodkdybfzovu.supabase.co/storage/v1/object/public/Landing%20page%20videos/SaaS%20RFS%20COMPRESSED.mp4" type="video/mp4" />
               </video>
-              <MuteButton isMuted={isMuted} isVisible={isHoveringReel} onToggle={toggleMute} size={muteSize} />
+              <MuteButton isMuted={isMuted} isVisible={muteVisible} onToggle={toggleMute} size={muteSize} />
             </div>
           </motion.div>
         )}
@@ -419,8 +527,8 @@ export default function Hero() {
               }}
             >
               <video
-                ref={showreelRef}
-                autoPlay muted loop playsInline preload="auto"
+                ref={showreelMobileRef}
+                autoPlay loop playsInline preload="auto"
                 style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
               >
                 <source src="https://thzrymlstodkdybfzovu.supabase.co/storage/v1/object/public/Landing%20page%20videos/SaaS%20RFS%20COMPRESSED.mp4" type="video/mp4" />
@@ -436,7 +544,7 @@ export default function Hero() {
                   Showreel 2025
                 </span>
               </div>
-              <MuteButton isMuted={isMuted} isVisible={isHoveringReel} onToggle={toggleMute} size={muteSize} />
+              <MuteButton isMuted={isMuted} isVisible={muteVisible} onToggle={toggleMute} size={muteSize} />
             </div>
           </motion.div>
         )}

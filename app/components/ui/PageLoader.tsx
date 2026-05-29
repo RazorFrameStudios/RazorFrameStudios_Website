@@ -86,16 +86,17 @@ export default function PageLoader() {
               gap: containerGap,
             }}
           >
-            {/* Brand name */}
+            {/* FIX: letterSpacing changed from "-0.04em" → "0.01em", fontFamily set to Coolvetica, lineHeight nudged to 1.08 */}
             <motion.div
               initial={{ y: 60, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               style={{
                 fontSize: "clamp(2rem, 5vw, 4rem)",
+                fontFamily: "'Coolvetica', sans-serif",
                 fontWeight: 800,
-                letterSpacing: "-0.04em",
-                lineHeight: 1,
+                letterSpacing: "0.01em",
+                lineHeight: 1.08,
                 color: "white",
                 whiteSpace: "nowrap",
                 textShadow: GLOW_WHITE,

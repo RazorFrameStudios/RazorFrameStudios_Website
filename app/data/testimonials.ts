@@ -2,16 +2,16 @@ export const testimonials = [
   {
     name: "John Doe",
     role: "CEO, BrandCo",
-    feedback: "RazorFrames completely transformed our brand presence with stunning visuals.",
+    feedback: "RazorFrameStudios completely transformed our brand presence with stunning visuals.",
   },
   {
     name: "Sarah Smith",
     role: "Founder, CreativeStudio",
-    feedback: "Professional, fast, and incredibly creative. Highly recommended!",
+    feedback: "Professional, fast, and incredibly creative. It was such a huge turn around. Highly recommended!",
   },
   {
     name: "Michael Lee",
     role: "Head of Marketing, TechVentures",
-    feedback: "Their storytelling and editing quality is on another level.",
+    feedback: "Their storytelling and editing quality is on another level. They are perfect in every way possible.",
   },
 ];

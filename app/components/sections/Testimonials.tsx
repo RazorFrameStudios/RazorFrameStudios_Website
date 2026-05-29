@@ -237,12 +237,13 @@ export default function Testimonials() {
             }}>
               Client Stories
             </p>
+            {/* FIX: letterSpacing changed from "-0.02em" → "0.01em", lineHeight nudged to 1.08 */}
             <h2 style={{
               fontSize: h2Size,
               fontFamily: "'Coolvetica', sans-serif",
               fontWeight: 600,
-              letterSpacing: "-0.02em",
-              lineHeight: 1.1,
+              letterSpacing: "0.01em",
+              lineHeight: 1.08,
               color: "#ffffff",
             }}>
               What Our Clients Say

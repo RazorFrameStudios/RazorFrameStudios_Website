@@ -71,7 +71,7 @@ const services = [
     title: "Ad Creatives",
     tagline: "Clear Messaging. High Conversions.",
     description:
-      "We produce ad content designed to do one thing — GET RESULTS. The focus is on clear messaging, strong visuals, and making sure the right audience pays attention. Whether you're selling a product or building a brand, we create ads that feel natural and drive real action.",
+      "We produce ad content designed to do one thing; GET RESULTS. The focus is on clear messaging, strong visuals, and making sure the right audience pays attention. Whether you're selling a product or building a brand, we create ads that feel natural and drive real action.",
     features: ["Ad Strategy", "Hook & Messaging", "Conversion Focus", "Brand Alignment"],
     icon: "◉",
     cards: [
@@ -444,10 +444,11 @@ function ServiceText({ service, isLarge, isMobile, isTablet, isLaptop, isDesktop
         <span style={{ color: "#03C04A", fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400, fontSize: taglineFontSize, letterSpacing: "0.2em", textTransform: "uppercase" }}>{service.tagline}</span>
       </div>
 
+      {/* FIX: letterSpacing "-0.02em" → "0.01em", lineHeight 1.1 → 1.08 */}
       <h2 style={{
         fontSize: h2FontSize,
         fontFamily: "'Coolvetica', sans-serif", fontWeight: 600,
-        letterSpacing: "-0.02em", lineHeight: 1.1,
+        letterSpacing: "0.01em", lineHeight: 1.08,
         color: "white", marginBottom: h2MarginBottom,
       }}>{service.title}</h2>
 
@@ -565,6 +566,7 @@ export default function ServicesPage() {
               fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400,
               color: "white", marginBottom: "1rem",
             }}>What We Offer</p>
+            {/* FIX: letterSpacing "-0.02em" → "0.01em", lineHeight 1.05 → 1.08 */}
             <h1 style={{
               fontSize: isMobile
                 ? "clamp(2.5rem, 10vw, 3.5rem)"
@@ -578,7 +580,7 @@ export default function ServicesPage() {
                 ? "clamp(5rem, 5.5vw, 7.5rem)"
                 : "clamp(6rem, 5vw, 8.5rem)",
               fontFamily: "'Coolvetica', sans-serif", fontWeight: 600,
-              letterSpacing: "-0.02em", lineHeight: 1.05,
+              letterSpacing: "0.01em", lineHeight: 1.08,
               color: "white", marginBottom: "1.5rem",
               maxWidth: isDesktop ? "1400px" : isLaptop ? "500px" : is2K ? "2560px" : is4K ? "3840px" : "700px",
             }}>
@@ -669,10 +671,11 @@ export default function ServicesPage() {
               fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400,
               color: "white", marginBottom: "1rem",
             }}>Ready to Start?</p>
+            {/* FIX: letterSpacing "-0.02em" → "0.01em", lineHeight 1.1 → 1.08 */}
             <h2 style={{
-              fontSize : is4K ? "clamp(8rem, 3.2vw, 4.5rem)" : is2K ? "clamp(2.8rem, 3vw, 4rem)" : isDesktop ? "clamp(2.5rem, 2.8vw, 3.8rem)" : isLaptop ? "clamp(2.5rem, 2.8vw, 3.8rem)" : "clamp(2rem, 3.5vw, 3rem)",
+              fontSize: is4K ? "clamp(8rem, 3.2vw, 4.5rem)" : is2K ? "clamp(2.8rem, 3vw, 4rem)" : isDesktop ? "clamp(2.5rem, 2.8vw, 3.8rem)" : isLaptop ? "clamp(2.5rem, 2.8vw, 3.8rem)" : "clamp(2rem, 3.5vw, 3rem)",
               fontFamily: "'Coolvetica', sans-serif", fontWeight: 600,
-              letterSpacing: "-0.02em", lineHeight: 1.1,
+              letterSpacing: "0.01em", lineHeight: 1.08,
               color: "white", marginBottom: "1.25rem",
             }}>
               Let's Create Something<br />Extraordinary
@@ -681,7 +684,7 @@ export default function ServicesPage() {
               fontSize: isMobile ? "0.95rem" : isTablet ? "1rem" : isLaptop ? "1.1rem" : isDesktop ? "1.2rem" : is2K ? "1.35rem" : "2rem",
               fontFamily: "Arial, Helvetica, sans-serif", fontWeight: 400,
               color: "rgba(255,255,255,0.7)",
-              maxWidth: is4K ? "1000px" :                      isDesktop ? "600px" : isLaptop ? "520px" : "440px",
+              maxWidth: is4K ? "1000px" : isDesktop ? "600px" : isLaptop ? "520px" : "440px",
               margin: "0 auto 2.5rem", lineHeight: 1.7,
             }}>
               Book a free 30-minute strategy call. Tell us about your content or brand and let's build something powerful together.
