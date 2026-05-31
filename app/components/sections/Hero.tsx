@@ -2,12 +2,17 @@
 
 import { motion } from "framer-motion";
 import { useBreakpoint } from "../hooks/useBreakpoint";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 
 const BTN_GREEN  = "#1B5E34";
 const GLOW_WHITE = "0 0 30px rgba(3,192,74,0.15)";
 
-// FIX 1: Accept onClick on the wrapper div for touch support
+const BG_SRC      = "https://thzrymlstodkdybfzovu.supabase.co/storage/v1/object/public/Landing%20page%20videos/Website%20background%20COMPRESSED.mp4";
+const REEL_SRC    = "https://thzrymlstodkdybfzovu.supabase.co/storage/v1/object/public/Landing%20page%20videos/SaaS%20RFS%20COMPRESSED.mp4";
+
+// ---------------------------------------------------------------------------
+// MuteButton
+// ---------------------------------------------------------------------------
 function MuteButton({
   isMuted,
   isVisible,
@@ -22,10 +27,7 @@ function MuteButton({
   const iconSize = Math.round(size * 0.44);
   return (
     <button
-      onClick={(e) => {
-        e.stopPropagation();
-        onToggle();
-      }}
+      onClick={(e) => { e.stopPropagation(); onToggle(); }}
       style={{
         position: "absolute",
         bottom: "12px",
@@ -37,18 +39,14 @@ function MuteButton({
         background: "rgba(0,0,0,0.55)",
         border: "1px solid rgba(255,255,255,0.2)",
         backdropFilter: "blur(6px)",
+        WebkitBackdropFilter: "blur(6px)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
         cursor: "pointer",
-        // FIX 2: Always visible on mobile (touch devices have no hover),
-        //         hover-gated only on non-touch (pointer: fine) via opacity.
-        //         We handle this by always rendering but letting the parent
-        //         control visibility through `isVisible` only on non-touch.
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? "scale(1)" : "scale(0.85)",
         transition: "opacity 0.2s ease, transform 0.2s ease",
-        // Always allow pointer events so touch users can tap it
         pointerEvents: "auto",
       }}
       aria-label={isMuted ? "Unmute" : "Mute"}
@@ -70,124 +68,146 @@ function MuteButton({
   );
 }
 
+// ---------------------------------------------------------------------------
+// Shared video props helper — single source of truth for all video attributes
+// ---------------------------------------------------------------------------
+function getVideoProps(preload: "none" | "metadata" | "auto") {
+  return {
+    autoPlay: true,
+    loop: true,
+    muted: true,          // must be true in JSX so React sets the property
+    playsInline: true,    // critical for iOS inline playback
+    preload,
+    // iOS Safari legacy attribute — kept as a data attribute to avoid TS errors
+    "data-webkit-playsinline": "true",
+  } as const;
+}
+
+// ---------------------------------------------------------------------------
+// useVideoSetup — handles muted sync + gentle stall recovery (no el.load())
+// ---------------------------------------------------------------------------
+function useVideoSetup(
+  refs: React.RefObject<HTMLVideoElement | null>[],
+  isMuted: boolean
+) {
+  // Sync muted/volume whenever isMuted changes
+  useEffect(() => {
+    refs.forEach((r) => {
+      const el = r.current;
+      if (!el) return;
+      el.muted  = isMuted;
+      el.volume = isMuted ? 0 : 1;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isMuted]);
+
+  // Gentle stall recovery — NO el.load(), just el.play()
+  useEffect(() => {
+    const cleanups: (() => void)[] = [];
+
+    refs.forEach((r) => {
+      const el = r.current;
+      if (!el) return;
+
+      let timer: ReturnType<typeof setTimeout> | null = null;
+
+      const scheduleRetry = () => {
+        if (timer) return; // already waiting
+        timer = setTimeout(() => {
+          timer = null;
+          if (!el || el.readyState >= 3 || !el.paused) return;
+          el.play().catch(() => {});
+        }, 2000);
+      };
+
+      const cancelRetry = () => {
+        if (timer) { clearTimeout(timer); timer = null; }
+      };
+
+      el.addEventListener("stalled", scheduleRetry);
+      el.addEventListener("waiting", scheduleRetry);
+      el.addEventListener("playing", cancelRetry);
+      el.addEventListener("canplay", cancelRetry);
+
+      cleanups.push(() => {
+        cancelRetry();
+        el.removeEventListener("stalled", scheduleRetry);
+        el.removeEventListener("waiting", scheduleRetry);
+        el.removeEventListener("playing", cancelRetry);
+        el.removeEventListener("canplay", cancelRetry);
+      });
+    });
+
+    return () => cleanups.forEach((fn) => fn());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+}
+
+// ---------------------------------------------------------------------------
+// usePageVisibility — pause/resume all videos when tab is hidden/shown
+// (prevents battery drain & state desync on mobile)
+// ---------------------------------------------------------------------------
+function usePageVisibility(refs: React.RefObject<HTMLVideoElement | null>[]) {
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      refs.forEach((r) => {
+        const el = r.current;
+        if (!el) return;
+        if (document.hidden) {
+          el.pause();
+        } else {
+          el.play().catch(() => {});
+        }
+      });
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+}
+
+// ---------------------------------------------------------------------------
+// Hero
+// ---------------------------------------------------------------------------
 export default function Hero() {
   const { isMobile, isTablet, isLaptop, isDesktop, is2K, is4K } = useBreakpoint();
 
-  const showreelRef       = useRef<HTMLVideoElement>(null);
-  const showreelMobileRef = useRef<HTMLVideoElement>(null);
+  const bgVideoRef          = useRef<HTMLVideoElement>(null);
+  const showreelRef         = useRef<HTMLVideoElement>(null);
+  const showreelMobileRef   = useRef<HTMLVideoElement>(null);
+
   const [isMuted, setIsMuted]               = useState(true);
   const [isHoveringReel, setIsHoveringReel] = useState(false);
+  const [isTouchDevice, setIsTouchDevice]   = useState(false);
 
-  // FIX 3: Detect touch device so the mute button is always visible on mobile/touch
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  // Detect touch device once on mount
   useEffect(() => {
     setIsTouchDevice(
       "ontouchstart" in window || navigator.maxTouchPoints > 0
     );
   }, []);
 
-  // Initialize videos on mount with correct muted state
-  useEffect(() => {
-    const initVideo = (videoEl: HTMLVideoElement | null) => {
-      if (!videoEl) return;
-      videoEl.muted = isMuted;
-      videoEl.volume = isMuted ? 0 : 1;
-      console.log("Initialized video:", { muted: videoEl.muted, volume: videoEl.volume });
-    };
-    initVideo(showreelRef.current);
-    initVideo(showreelMobileRef.current);
+  // Mute toggle — clean, no setAttribute needed (property is enough)
+  const toggleMute = useCallback(() => {
+    setIsMuted((prev) => !prev);
   }, []);
 
-  // FIX 4: More robust mute toggle with volume control and debugging
-  const toggleMute = () => {
-    const next = !isMuted;
-    console.log("Toggle mute:", { from: isMuted, to: next });
+  // Wire up all video refs
+  const allRefs    = [bgVideoRef, showreelRef, showreelMobileRef];
+  const reelRefs   = [showreelRef, showreelMobileRef];
 
-    if (showreelRef.current) {
-      showreelRef.current.muted = next;
-      showreelRef.current.volume = next ? 0 : 1;
-      if (next) {
-        showreelRef.current.setAttribute("muted", "");
-      } else {
-        showreelRef.current.removeAttribute("muted");
-      }
-      console.log("Desktop video muted:", showreelRef.current.muted, "volume:", showreelRef.current.volume);
-    }
-    if (showreelMobileRef.current) {
-      showreelMobileRef.current.muted = next;
-      showreelMobileRef.current.volume = next ? 0 : 1;
-      if (next) {
-        showreelMobileRef.current.setAttribute("muted", "");
-      } else {
-        showreelMobileRef.current.removeAttribute("muted");
-      }
-      console.log("Mobile video muted:", showreelMobileRef.current.muted, "volume:", showreelMobileRef.current.volume);
-    }
-    setIsMuted(next);
-  };
+  useVideoSetup(reelRefs, isMuted);
+  usePageVisibility(allRefs);
 
-  // FIX 5: Sync muted and volume on mount and when isMuted changes
-  useEffect(() => {
-    const syncVideo = (videoEl: HTMLVideoElement | null) => {
-      if (!videoEl) return;
-      
-      // Set both muted property and volume
-      videoEl.muted = isMuted;
-      videoEl.volume = isMuted ? 0 : 1;
-      
-      // Set/remove attribute
-      if (isMuted) {
-        videoEl.setAttribute("muted", "");
-      } else {
-        videoEl.removeAttribute("muted");
-      }
-      
-      console.log("Synced video:", { muted: videoEl.muted, volume: videoEl.volume });
-    };
+  // ── Background video: lower priority so showreel decoder gets priority ──
+  // On mobile we use preload="none" for the bg video and "metadata" for the
+  // showreel. Both still autoPlay — this just staggers the initial network
+  // burst so the browser doesn't throttle both decoders simultaneously.
+  const bgPreload    = isMobile ? "none"     : "auto";
+  const reelPreload  = isMobile ? "metadata" : "auto";
 
-    syncVideo(showreelRef.current);
-    syncVideo(showreelMobileRef.current);
-  }, [isMuted]);
-
-  // FIX 6: Recover from stalls — if the video stalls for more than 3 s, replay it
-  useEffect(() => {
-    const refs = [showreelRef, showreelMobileRef];
-    const timers: ReturnType<typeof setTimeout>[] = [];
-
-    refs.forEach((r) => {
-      const el = r.current;
-      if (!el) return;
-
-      const onStall = () => {
-        const t = setTimeout(() => {
-          if (!el) return;
-          const time = el.currentTime;
-          el.load();           // re-fetch the segment
-          el.currentTime = time;
-          el.play().catch(() => {});
-        }, 3000);
-        timers.push(t);
-      };
-
-      const clearTimer = () => timers.forEach(clearTimeout);
-
-      el.addEventListener("stalled",  onStall);
-      el.addEventListener("waiting",  onStall);
-      el.addEventListener("playing",  clearTimer);
-      el.addEventListener("canplay",  clearTimer);
-
-      return () => {
-        el.removeEventListener("stalled",  onStall);
-        el.removeEventListener("waiting",  onStall);
-        el.removeEventListener("playing",  clearTimer);
-        el.removeEventListener("canplay",  clearTimer);
-      };
-    });
-
-    return () => timers.forEach(clearTimeout);
-  }, []);
-
-  // ── Container ──────────────────────────────────────────────────────────────
+  // ── Layout ──────────────────────────────────────────────────────────────
   const maxWidth = isMobile
     ? "100%"
     : isTablet
@@ -230,7 +250,7 @@ export default function Hero() {
     ? "4rem"    : is2K
     ? "5rem"    : "6rem";
 
-  // ── Typography ─────────────────────────────────────────────────────────────
+  // ── Typography ─────────────────────────────────────────────────────────
   const topperFont = isMobile
     ? "0.68rem" : isTablet
     ? "0.72rem" : isLaptop
@@ -285,7 +305,7 @@ export default function Hero() {
     ? "3rem"    : is2K
     ? "3.5rem"  : "4.5rem";
 
-  // ── Buttons ────────────────────────────────────────────────────────────────
+  // ── Buttons ────────────────────────────────────────────────────────────
   const btnPad = isMobile
     ? "0.75rem 1.75rem" : isTablet
     ? "0.85rem 2rem"    : isLaptop
@@ -307,7 +327,7 @@ export default function Hero() {
     ? "1.1rem"  : is2K
     ? "1.25rem" : "1.5rem";
 
-  // ── Showreel ───────────────────────────────────────────────────────────────
+  // ── Showreel ───────────────────────────────────────────────────────────
   const reelRadius = isMobile
     ? "12px"  : isTablet
     ? "14px"  : isLaptop
@@ -322,27 +342,59 @@ export default function Hero() {
     ? 42  : is2K
     ? 50  : 62;
 
-  const playLabelFont = isMobile
-    ? "0.62rem" : "0.68rem";
-
-  // Mute button is visible on hover (desktop) or always (touch/mobile)
+  // Mute button: always visible on touch devices, hover-gated on desktop
   const muteVisible = isTouchDevice ? true : isHoveringReel;
+
+  // Shared video container style
+  const reelContainerStyle = (border: string): React.CSSProperties => ({
+    borderRadius: reelRadius,
+    overflow: "hidden",
+    border,
+    aspectRatio: "16/9",
+    background: "#111111",
+    position: "relative",
+    // GPU compositing layer — prevents freeze during scroll on mobile
+    transform: "translateZ(0)",
+    WebkitTransform: "translateZ(0)",
+    willChange: "transform",
+  });
+
+  // Shared video inline style
+  const reelVideoStyle: React.CSSProperties = {
+    width: "100%",
+    height: "100%",
+    objectFit: "cover",
+    display: "block",
+  };
 
   return (
     <section
       className="relative overflow-hidden"
       style={{ background: "#000000", minHeight: "100vh", display: "flex", alignItems: "center" }}
     >
-      {/* Background video */}
+      {/* ── Background video ── */}
+      {/*
+        FIX: preload="none" on mobile so the bg decoder doesn't compete with
+        the showreel decoder at startup. autoPlay still fires after first
+        interaction / when the browser is ready.
+      */}
       <video
-        autoPlay loop playsInline muted preload="auto"
+        ref={bgVideoRef}
+        {...getVideoProps(bgPreload)}
         className="absolute inset-0 w-full h-full object-cover"
-        style={{ opacity: 1, zIndex: 0 }}
+        style={{
+          opacity: 1,
+          zIndex: 0,
+          // GPU layer for background too — avoids composite-layer thrash on scroll
+          transform: "translateZ(0)",
+          WebkitTransform: "translateZ(0)",
+          willChange: "transform",
+        }}
       >
-        <source src="https://thzrymlstodkdybfzovu.supabase.co/storage/v1/object/public/Landing%20page%20videos/Website%20background%20COMPRESSED.mp4" type="video/mp4" />
+        <source src={BG_SRC} type="video/mp4" />
       </video>
 
-      {/* Content grid */}
+      {/* ── Content grid ── */}
       <div
         className="relative w-full"
         style={{
@@ -433,36 +485,46 @@ export default function Hero() {
               justifyContent: isMobile ? "center" : "flex-start",
             }}
           >
-            <a href="#booking"
+            <a
+              href="#booking"
               className="btn-shimmer"
               style={{
-                background: BTN_GREEN, color: "#fff",
+                background: BTN_GREEN,
+                color: "#fff",
                 padding: btnPad,
-                borderRadius: "9999px", fontWeight: 600,
+                borderRadius: "9999px",
+                fontWeight: 600,
                 fontFamily: "Arial, Helvetica, sans-serif",
                 fontSize: btnFont,
-                letterSpacing: "0.02em", textDecoration: "none",
-                transition: "opacity 0.2s", overflow: "hidden",
+                letterSpacing: "0.02em",
+                textDecoration: "none",
+                transition: "opacity 0.2s",
+                overflow: "hidden",
               }}
-              onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.opacity = "0.85"; }}
-              onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.opacity = "1"; }}
+              onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.85"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = "1"; }}
             >
               Book a Call
             </a>
 
-            <a href="#portfolio"
+            <a
+              href="#portfolio"
               className="btn-shimmer btn-shimmer-outline"
               style={{
-                background: "transparent", color: "white",
+                background: "transparent",
+                color: "white",
                 padding: btnPad,
-                borderRadius: "9999px", fontWeight: 600,
+                borderRadius: "9999px",
+                fontWeight: 600,
                 fontFamily: "Arial, Helvetica, sans-serif",
                 fontSize: btnFont,
                 border: "1px solid rgba(255,255,255,0.25)",
-                textDecoration: "none", transition: "border-color 0.2s", overflow: "hidden",
+                textDecoration: "none",
+                transition: "border-color 0.2s",
+                overflow: "hidden",
               }}
-              onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.borderColor = "#03C04A"; }}
-              onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)"; }}
+              onMouseEnter={(e) => { e.currentTarget.style.borderColor = "#03C04A"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)"; }}
             >
               View Our Work
             </a>
@@ -477,6 +539,7 @@ export default function Hero() {
             transition={{ delay: 0.5, duration: 1, ease: [0.16, 1, 0.3, 1] }}
             style={{ position: "relative" }}
           >
+            {/* Glow halo */}
             <div
               style={{
                 position: "absolute",
@@ -486,24 +549,18 @@ export default function Hero() {
                 pointerEvents: "none",
               }}
             />
+
             <div
               onMouseEnter={() => setIsHoveringReel(true)}
               onMouseLeave={() => setIsHoveringReel(false)}
-              style={{
-                borderRadius: reelRadius,
-                overflow: "hidden",
-                border: "1px solid black",
-                aspectRatio: "16/9",
-                background: "whitesmoke",
-                position: "relative",
-              }}
+              style={reelContainerStyle("1px solid black")}
             >
-            <video
+              <video
                 ref={showreelRef}
-                autoPlay loop playsInline preload="auto"
-                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                {...getVideoProps(reelPreload)}
+                style={reelVideoStyle}
               >
-                <source src="https://thzrymlstodkdybfzovu.supabase.co/storage/v1/object/public/Landing%20page%20videos/SaaS%20RFS%20COMPRESSED.mp4" type="video/mp4" />
+                <source src={REEL_SRC} type="video/mp4" />
               </video>
               <MuteButton isMuted={isMuted} isVisible={muteVisible} onToggle={toggleMute} size={muteSize} />
             </div>
@@ -520,18 +577,14 @@ export default function Hero() {
             <div
               onMouseEnter={() => setIsHoveringReel(true)}
               onMouseLeave={() => setIsHoveringReel(false)}
-              style={{
-                borderRadius: reelRadius, overflow: "hidden",
-                border: "1px solid rgba(3,192,74,0.2)", aspectRatio: "16/9",
-                background: "#111111", position: "relative",
-              }}
+              style={reelContainerStyle("1px solid rgba(3,192,74,0.2)")}
             >
               <video
                 ref={showreelMobileRef}
-                autoPlay loop playsInline preload="auto"
-                style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
+                {...getVideoProps(reelPreload)}
+                style={reelVideoStyle}
               >
-                <source src="https://thzrymlstodkdybfzovu.supabase.co/storage/v1/object/public/Landing%20page%20videos/SaaS%20RFS%20COMPRESSED.mp4" type="video/mp4" />
+                <source src={REEL_SRC} type="video/mp4" />
               </video>
               <MuteButton isMuted={isMuted} isVisible={muteVisible} onToggle={toggleMute} size={muteSize} />
             </div>
@@ -539,13 +592,17 @@ export default function Hero() {
         )}
       </div>
 
-      {/* Bottom fade */}
+      {/* ── Bottom fade ── */}
       <div
         style={{
-          position: "absolute", bottom: 0, left: 0, right: 0,
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
           height: is4K ? "200px" : is2K ? "160px" : isDesktop ? "140px" : "120px",
           background: "linear-gradient(to bottom, transparent 0%, transparent 40%, #000000 100%)",
-          zIndex: 2, pointerEvents: "none",
+          zIndex: 2,
+          pointerEvents: "none",
         }}
       />
     </section>
