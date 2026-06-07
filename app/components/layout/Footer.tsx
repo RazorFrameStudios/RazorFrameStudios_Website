@@ -42,7 +42,7 @@ export default function Footer() {
     ? "1fr"
     : isTablet
     ? "repeat(2, 1fr)"
-    : "repeat(3, 1fr)";
+    : "repeat(4, 1fr)";
 
   const gridGap = isMobile
     ? "2rem"   : isTablet
@@ -151,7 +151,6 @@ export default function Footer() {
 
         {/* ── Brand ── */}
         <div>
-          {/* FIX: letterSpacing changed from "-0.02em" → "0.01em", lineHeight set to 1.08 */}
           <h3 style={{
             fontSize: brandFont,
             fontWeight: 600,
@@ -194,7 +193,56 @@ export default function Footer() {
               { label: "Home",     href: "/" },
               { label: "Services", href: "/services" },
               { label: "Work",     href: "/work" },
+              { label: "About",    href: "/about" },
               { label: "Contact",  href: "/booking" },
+            ].map(({ label, href }) => (
+              <li key={label}>
+                <Link
+                  href={href}
+                  style={{
+                    color: "rgba(255,255,255,0.7)",
+                    textDecoration: "none",
+                    fontSize: linkFont,
+                    fontFamily: "Arial, Helvetica, sans-serif",
+                    fontWeight: 400,
+                    transition: "color 0.2s, text-shadow 0.2s",
+                  }}
+                  onMouseEnter={e => {
+                    e.currentTarget.style.color = "#03C04A";
+                    e.currentTarget.style.textShadow = GLOW_GREEN;
+                  }}
+                  onMouseLeave={e => {
+                    e.currentTarget.style.color = "rgba(255,255,255,0.45)";
+                    e.currentTarget.style.textShadow = "none";
+                  }}
+                >
+                  {label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* ── About ── */}
+        <div>
+          <h4 style={{
+            fontSize: labelFont,
+            fontWeight: 700,
+            fontFamily: "Arial, Helvetica, sans-serif",
+            marginBottom: headingMB,
+            color: "#03C04A",
+            textShadow: GLOW_GREEN,
+            letterSpacing: "0.2em",
+            textTransform: "uppercase",
+          }}>
+            Company
+          </h4>
+          <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: linkGap }}>
+            {[
+              { label: "About Us",      href: "/about" },
+              { label: "Our Work",      href: "/work" },
+              { label: "Our Services",  href: "/services" },
+              { label: "Book a Call",   href: "/booking" },
             ].map(({ label, href }) => (
               <li key={label}>
                 <Link

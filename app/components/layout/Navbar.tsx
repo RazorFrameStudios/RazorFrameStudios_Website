@@ -14,6 +14,7 @@ const NAV_LINKS = [
   { label: "Home",     href: "/" },
   { label: "Services", href: "/services" },
   { label: "Work",     href: "/work" },
+  { label: "About Us",    href: "/about" },
   { label: "Contact",  href: "/booking" },
 ];
 
@@ -46,7 +47,6 @@ export default function Navbar() {
     ? "1.4rem" : is2K
     ? "1.6rem" : "2rem";
 
-  // Logo height: collapsed (scrolled) vs expanded (top of page)
   const logoHeightExpanded = isMobile
     ? 28  : isTablet
     ? 32  : isLaptop
@@ -75,10 +75,10 @@ export default function Navbar() {
     ? "1.4rem"  : "0.9rem";
 
   const linkGap = isLaptop
-    ? "2rem"    : isDesktop
-    ? "2.5rem"  : is2K
-    ? "3rem"    : is4K
-    ? "3.75rem" : "2rem";
+    ? "1.6rem"  : isDesktop
+    ? "2rem"    : is2K
+    ? "2.5rem"  : is4K
+    ? "3.25rem" : "1.6rem";
 
   const ctaPad = isLaptop
     ? "0.55rem 1.4rem"  : isDesktop
@@ -127,7 +127,6 @@ export default function Navbar() {
             transition={TRANSITION}
             style={{ width: "auto", objectFit: "contain", display: "block" }}
           />
-          {/* FIX: fontFamily set to Coolvetica, letterSpacing changed from "0em" → "0.01em", lineHeight set to 1.08 */}
           <motion.h1
             animate={{ opacity: scrolled ? 0 : 1, x: scrolled ? -12 : 0, width: scrolled ? 0 : "auto" }}
             transition={TRANSITION}

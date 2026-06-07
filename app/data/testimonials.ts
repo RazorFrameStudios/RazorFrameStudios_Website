@@ -2,7 +2,7 @@ export const testimonials = [
   {
     name: "John Doe",
     role: "CEO, BrandCo",
-    feedback: "Razor Frame Studios completely transformed our brand presence with stunning visuals.",
+    feedback: "RazorFrame Studios completely transformed our brand presence with stunning visuals.",
   },
   {
     name: "Sarah Smith",
